@@ -14,17 +14,17 @@ const COLUMNS = [
   {
     title: "Yordam",
     links: [
-      { label: "Ko'p so'raladigan savollar", href: "#" },
-      { label: "Yetkazib berish", href: "#" },
-      { label: "Qaytarish siyosati", href: "#" },
+      { label: "Ko'p so'raladigan savollar", href: "/faq" },
+      { label: "Yetkazib berish", href: "/delivery" },
+      { label: "Qaytarish siyosati", href: "/returns" },
     ],
   },
   {
     title: "Kompaniya",
     links: [
-      { label: "Biz haqimizda", href: "#" },
-      { label: "Filiallar", href: "#" },
-      { label: "Hamkorlik", href: "#" },
+      { label: "Biz haqimizda", href: "/about" },
+      { label: "Filiallar", href: "/locations" },
+      { label: "Hamkorlik", href: "/partners" },
     ],
   },
 ];
