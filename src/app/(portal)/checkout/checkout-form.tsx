@@ -24,6 +24,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { PageContainer } from "@/modules/customer/components/section";
+import { FakePaymentCard } from "@/modules/customer/components/fake-payment-card";
 import { cn } from "@/lib/utils";
 
 type Address = {
@@ -61,10 +62,13 @@ export function CheckoutForm({ addresses }: { addresses: Address[] }) {
 
   const [paymentMethod, setPaymentMethod] =
     React.useState<(typeof PAYMENT_METHODS)[number]>("CASH_ON_DELIVERY");
+  const [onlinePaymentValid, setOnlinePaymentValid] = React.useState(false);
   const [prescriptionImageUrl, setPrescriptionImageUrl] = React.useState("");
   const [submitting, setSubmitting] = React.useState(false);
 
   const total = subtotal + DELIVERY_FEE;
+  const isOnlinePayment = paymentMethod !== "CASH_ON_DELIVERY";
+  const canSubmit = !isOnlinePayment || onlinePaymentValid;
 
   async function handleAddAddress() {
     if (newAddress.trim().length < 5) {
@@ -103,6 +107,10 @@ export function CheckoutForm({ addresses }: { addresses: Address[] }) {
     }
     if (requiresPrescription && !prescriptionImageUrl) {
       toast.error("Retsept rasmini yuklang");
+      return;
+    }
+    if (isOnlinePayment && !onlinePaymentValid) {
+      toast.error("To'lov ma'lumotlarini to'g'ri kiriting");
       return;
     }
     setSubmitting(true);
@@ -214,7 +222,10 @@ export function CheckoutForm({ addresses }: { addresses: Address[] }) {
               <button
                 key={opt.value}
                 type="button"
-                onClick={() => setPaymentMethod(opt.value)}
+                onClick={() => {
+                  setPaymentMethod(opt.value);
+                  setOnlinePaymentValid(false);
+                }}
                 className={cn(
                   "flex flex-col items-center gap-2 rounded-2xl border p-4 text-center text-sm font-medium transition-all hover:border-primary/40",
                   paymentMethod === opt.value ? "border-primary bg-primary/5 text-primary" : "border-border"
@@ -231,10 +242,12 @@ export function CheckoutForm({ addresses }: { addresses: Address[] }) {
               Kuryer yetkazib berganda naqd pulda to&apos;laysiz.
             </p>
           ) : (
-            <p className="mt-3 rounded-xl bg-amber-50 p-3 text-xs text-amber-800 dark:bg-amber-950/20 dark:text-amber-400">
-              {PAYMENT_OPTIONS.find((o) => o.value === paymentMethod)?.label} orqali onlayn to&apos;lov
-              hali ulanmagan. Buyurtmangiz qabul qilinadi, to&apos;lov keyinroq tasdiqlanadi.
-            </p>
+            <FakePaymentCard
+              key={paymentMethod}
+              providerLabel={PAYMENT_OPTIONS.find((o) => o.value === paymentMethod)?.label ?? ""}
+              amount={total}
+              onValidChange={setOnlinePaymentValid}
+            />
           )}
 
           {requiresPrescription && (
@@ -281,7 +294,11 @@ export function CheckoutForm({ addresses }: { addresses: Address[] }) {
             <span>{total.toLocaleString("uz-UZ")} so&apos;m</span>
           </div>
         </div>
-        <Button className="mt-5 h-12 w-full gap-1.5 rounded-full text-base" onClick={handleSubmit} disabled={submitting}>
+        <Button
+          className="mt-5 h-12 w-full gap-1.5 rounded-full text-base"
+          onClick={handleSubmit}
+          disabled={submitting || !canSubmit}
+        >
           {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowRight className="h-4 w-4" />}
           Buyurtmani tasdiqlash
         </Button>
