@@ -19,7 +19,6 @@ import { AIBanner } from "@/modules/customer/components/ai-banner";
 import { ProfileForm } from "@/modules/customer/components/profile-form";
 import { ORDER_STATUS_LABELS, ORDER_STATUS_VARIANT } from "@/lib/order-labels";
 import { checkExpiryForCustomer } from "@/lib/expiry-check";
-import { TelegramLinkCard } from "@/modules/customer/components/telegram-link-card";
 
 export default async function AccountPage() {
   const session = await auth();
@@ -163,8 +162,6 @@ export default async function AccountPage() {
               </div>
             )}
           </div>
-
-          <TelegramLinkCard linked={!!customer.telegramChatId} />
 
           <AIBanner compact />
         </div>

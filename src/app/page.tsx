@@ -3,6 +3,6 @@ import { auth } from "@/lib/auth";
 
 export default async function Home() {
   const session = await auth();
-  if (!session?.user) redirect("/login");
+  if (!session?.user) redirect("/shop");
   redirect(session.user.type === "CUSTOMER" ? "/account" : "/dashboard");
 }

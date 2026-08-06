@@ -12,14 +12,14 @@ export default async function PortalLayout({
   children: React.ReactNode;
 }) {
   const session = await auth();
-  if (!session?.user) redirect("/login");
-  if (session.user.type !== "CUSTOMER") redirect("/dashboard");
+  if (session?.user && session.user.type !== "CUSTOMER") redirect("/dashboard");
+  const customerName = session?.user?.type === "CUSTOMER" ? (session.user.name ?? "Mijoz") : null;
 
   return (
     <CartProvider>
       <AIChatProvider>
         <div className="portal-theme flex min-h-screen flex-col bg-background text-foreground">
-          <PortalHeader customerName={session.user.name ?? "Mijoz"} />
+          <PortalHeader customerName={customerName} />
           <main className="flex-1">{children}</main>
           <PortalFooter />
         </div>

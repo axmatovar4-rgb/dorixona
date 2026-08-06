@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
@@ -138,6 +139,12 @@ export function RegisterForm() {
             </Button>
           </form>
         </Form>
+        <p className="mt-4 text-center text-sm text-muted-foreground">
+          Hisobingiz bormi?{" "}
+          <Link href="/login" className="text-primary hover:underline">
+            Kirish
+          </Link>
+        </p>
       </CardContent>
     </Card>
   );

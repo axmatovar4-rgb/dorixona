@@ -19,7 +19,11 @@ export const authConfig: NextAuthConfig = {
       session.user.role = token.role;
       return session;
     },
-    authorized({ auth }) {
+    authorized({ auth, request }) {
+      const { pathname } = request.nextUrl;
+      const isPublicPortalPath =
+        pathname === "/" || pathname === "/shop" || pathname.startsWith("/shop/");
+      if (isPublicPortalPath) return true;
       return !!auth?.user;
     },
   },

@@ -33,14 +33,14 @@ import { signOutAction } from "@/lib/actions";
 import { ModeToggle } from "@/components/mode-toggle";
 import { cn } from "@/lib/utils";
 
-export function PortalHeader({ customerName }: { customerName: string }) {
+export function PortalHeader({ customerName }: { customerName: string | null }) {
   const router = useRouter();
   const pathname = usePathname();
   const { itemCount } = useCart();
   const { openChat } = useAIChat();
   const [search, setSearch] = React.useState("");
 
-  const initials = customerName
+  const initials = (customerName ?? "")
     .split(" ")
     .map((p) => p[0])
     .slice(0, 2)
@@ -85,18 +85,20 @@ export function PortalHeader({ customerName }: { customerName: string }) {
 
           <ModeToggle />
 
-          <NotificationBell />
+          {customerName && <NotificationBell />}
 
-          <Link
-            href="/orders"
-            className={cn(
-              "hidden h-9 w-9 items-center justify-center rounded-full hover:bg-muted sm:flex",
-              pathname.startsWith("/orders") && "bg-muted text-primary"
-            )}
-            title="Buyurtmalarim"
-          >
-            <Package className="h-[18px] w-[18px]" />
-          </Link>
+          {customerName && (
+            <Link
+              href="/orders"
+              className={cn(
+                "hidden h-9 w-9 items-center justify-center rounded-full hover:bg-muted sm:flex",
+                pathname.startsWith("/orders") && "bg-muted text-primary"
+              )}
+              title="Buyurtmalarim"
+            >
+              <Package className="h-[18px] w-[18px]" />
+            </Link>
+          )}
 
           <Link
             href="/cart"
@@ -111,38 +113,49 @@ export function PortalHeader({ customerName }: { customerName: string }) {
             )}
           </Link>
 
-          <DropdownMenu>
-            <DropdownMenuTrigger className="ml-1 flex items-center gap-2 rounded-full p-0.5 hover:bg-muted">
-              <Avatar className="h-8 w-8">
-                <AvatarFallback className="bg-primary/10 text-xs font-semibold text-primary">
-                  {initials}
-                </AvatarFallback>
-              </Avatar>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuGroup>
-                <DropdownMenuLabel>{customerName}</DropdownMenuLabel>
-              </DropdownMenuGroup>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem render={<Link href="/account" />}>
-                <User className="h-4 w-4" />
-                Profilim
-              </DropdownMenuItem>
-              <DropdownMenuItem render={<Link href="/orders" />}>
-                <Package className="h-4 w-4" />
-                Buyurtmalarim
-              </DropdownMenuItem>
-              <DropdownMenuItem render={<Link href="/account/addresses" />}>
-                <MapPin className="h-4 w-4" />
-                Manzillarim
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem variant="destructive" onClick={() => signOutAction()}>
-                <LogOut className="h-4 w-4" />
-                Chiqish
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          {customerName ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger className="ml-1 flex items-center gap-2 rounded-full p-0.5 hover:bg-muted">
+                <Avatar className="h-8 w-8">
+                  <AvatarFallback className="bg-primary/10 text-xs font-semibold text-primary">
+                    {initials}
+                  </AvatarFallback>
+                </Avatar>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuGroup>
+                  <DropdownMenuLabel>{customerName}</DropdownMenuLabel>
+                </DropdownMenuGroup>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem render={<Link href="/account" />}>
+                  <User className="h-4 w-4" />
+                  Profilim
+                </DropdownMenuItem>
+                <DropdownMenuItem render={<Link href="/orders" />}>
+                  <Package className="h-4 w-4" />
+                  Buyurtmalarim
+                </DropdownMenuItem>
+                <DropdownMenuItem render={<Link href="/account/addresses" />}>
+                  <MapPin className="h-4 w-4" />
+                  Manzillarim
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem variant="destructive" onClick={() => signOutAction()}>
+                  <LogOut className="h-4 w-4" />
+                  Chiqish
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <div className="ml-1 flex items-center gap-2">
+              <Button variant="ghost" className="rounded-full" render={<Link href="/login" />}>
+                Kirish
+              </Button>
+              <Button className="rounded-full" render={<Link href="/register" />}>
+                Ro&apos;yxatdan o&apos;tish
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </header>
