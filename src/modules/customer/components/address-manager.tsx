@@ -3,7 +3,7 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Plus, Loader2, Star, Trash2, MapPin } from "lucide-react";
+import { Plus, Loader2, Star, Trash2, MapPin, LocateFixed } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -19,6 +19,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { createAddress, deleteAddress, setDefaultAddress } from "@/modules/customer/actions";
+import { detectCurrentAddress } from "@/modules/customer/geolocation";
 
 type Address = {
   id: string;
@@ -32,6 +33,20 @@ export function AddressManager({ addresses }: { addresses: Address[] }) {
   const [label, setLabel] = React.useState("");
   const [fullAddress, setFullAddress] = React.useState("");
   const [pending, setPending] = React.useState(false);
+  const [detecting, setDetecting] = React.useState(false);
+
+  async function handleDetectLocation() {
+    setDetecting(true);
+    try {
+      const address = await detectCurrentAddress();
+      setFullAddress(address);
+      toast.success("Manzil aniqlandi — kerak bo'lsa tahrirlab, saqlang");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Manzilni aniqlab bo'lmadi");
+    } finally {
+      setDetecting(false);
+    }
+  }
 
   async function handleAdd(e: React.FormEvent) {
     e.preventDefault();
@@ -69,34 +84,44 @@ export function AddressManager({ addresses }: { addresses: Address[] }) {
 
   return (
     <div className="flex flex-col gap-6">
-      <form
-        onSubmit={handleAdd}
-        className="flex flex-col gap-3 rounded-2xl border bg-card p-6 portal-shadow-sm sm:flex-row sm:items-end"
-      >
-        <div className="flex flex-1 flex-col gap-1.5">
-          <label className="text-sm font-medium">Nomi (ixtiyoriy)</label>
-          <Input
-            value={label}
-            onChange={(e) => setLabel(e.target.value)}
-            placeholder="Uy, Ish..."
-            className="h-11 rounded-xl"
-          />
-        </div>
-        <div className="flex flex-[2] flex-col gap-1.5">
-          <label className="text-sm font-medium">To&apos;liq manzil</label>
-          <Input
-            value={fullAddress}
-            onChange={(e) => setFullAddress(e.target.value)}
-            placeholder="Toshkent, Chilonzor..."
-            required
-            className="h-11 rounded-xl"
-          />
-        </div>
-        <Button type="submit" disabled={pending} className="h-11 gap-1.5 rounded-full">
-          {pending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
-          Qo&apos;shish
+      <div className="flex flex-col gap-3 rounded-2xl border bg-card p-6 portal-shadow-sm">
+        <Button
+          type="button"
+          variant="outline"
+          disabled={detecting}
+          onClick={handleDetectLocation}
+          className="w-fit gap-1.5 rounded-full"
+        >
+          {detecting ? <Loader2 className="h-4 w-4 animate-spin" /> : <LocateFixed className="h-4 w-4" />}
+          Joriy manzilimni aniqlash
         </Button>
-      </form>
+
+        <form onSubmit={handleAdd} className="flex flex-col gap-3 sm:flex-row sm:items-end">
+          <div className="flex flex-1 flex-col gap-1.5">
+            <label className="text-sm font-medium">Nomi (ixtiyoriy)</label>
+            <Input
+              value={label}
+              onChange={(e) => setLabel(e.target.value)}
+              placeholder="Uy, Ish..."
+              className="h-11 rounded-xl"
+            />
+          </div>
+          <div className="flex flex-[2] flex-col gap-1.5">
+            <label className="text-sm font-medium">To&apos;liq manzil</label>
+            <Input
+              value={fullAddress}
+              onChange={(e) => setFullAddress(e.target.value)}
+              placeholder="Toshkent, Chilonzor... (yoki yuqoridan aniqlang)"
+              required
+              className="h-11 rounded-xl"
+            />
+          </div>
+          <Button type="submit" disabled={pending} className="h-11 gap-1.5 rounded-full">
+            {pending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+            Qo&apos;shish
+          </Button>
+        </form>
+      </div>
 
       <div className="flex flex-col gap-3">
         {addresses.length === 0 ? (

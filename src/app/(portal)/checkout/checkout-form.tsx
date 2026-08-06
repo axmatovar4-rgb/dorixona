@@ -13,10 +13,12 @@ import {
   Check,
   ArrowRight,
   ShoppingBag,
+  LocateFixed,
 } from "lucide-react";
 import { useCart } from "@/modules/customer/cart-context";
 import { DELIVERY_FEE } from "@/modules/customer/constants";
 import { createOrder, createAddress } from "@/modules/customer/actions";
+import { detectCurrentAddress } from "@/modules/customer/geolocation";
 import { PAYMENT_METHODS } from "@/modules/customer/schemas";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -51,6 +53,20 @@ export function CheckoutForm({ addresses }: { addresses: Address[] }) {
   const [showNewAddress, setShowNewAddress] = React.useState(addresses.length === 0);
   const [newAddress, setNewAddress] = React.useState("");
   const [savingAddress, setSavingAddress] = React.useState(false);
+  const [detecting, setDetecting] = React.useState(false);
+
+  async function handleDetectLocation() {
+    setDetecting(true);
+    try {
+      const address = await detectCurrentAddress();
+      setNewAddress(address);
+      toast.success("Manzil aniqlandi — kerak bo'lsa tahrirlab, saqlang");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Manzilni aniqlab bo'lmadi");
+    } finally {
+      setDetecting(false);
+    }
+  }
 
   React.useEffect(() => {
     if (!addresses.some((a) => a.id === addressId)) {
@@ -167,6 +183,17 @@ export function CheckoutForm({ addresses }: { addresses: Address[] }) {
 
             {showNewAddress ? (
               <div className="flex flex-col gap-2 rounded-2xl border p-3.5">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  disabled={detecting}
+                  onClick={handleDetectLocation}
+                  className="w-fit gap-1.5 rounded-full"
+                >
+                  {detecting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <LocateFixed className="h-3.5 w-3.5" />}
+                  Joriy manzilimni aniqlash
+                </Button>
                 <Input
                   placeholder="To'liq manzilni kiriting"
                   value={newAddress}
