@@ -50,12 +50,31 @@ export default async function ShopHomePage({
   searchParams: Promise<{ search?: string; category?: string }>;
 }) {
   const { search, category } = await searchParams;
+  const isSearching = Boolean(search?.trim());
 
-  const [categories, newArrivalsRaw, featuredRaw, bestSellingAgg] = await Promise.all([
-    prisma.category.findMany({
-      include: { _count: { select: { products: { where: { isActive: true } } } } },
-      orderBy: { name: "asc" },
-    }),
+  const categories = await prisma.category.findMany({
+    include: { _count: { select: { products: { where: { isActive: true } } } } },
+    orderBy: { name: "asc" },
+  });
+
+  if (isSearching) {
+    return (
+      <PageContainer className="flex flex-col gap-6 py-8 sm:py-12">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+            &quot;{search}&quot; uchun qidiruv natijalari
+          </h1>
+        </div>
+        <ShopGrid
+          categories={categories.map((c) => ({ id: c.id, name: c.name }))}
+          initialSearch={search ?? ""}
+          initialCategoryId={category ?? ""}
+        />
+      </PageContainer>
+    );
+  }
+
+  const [newArrivalsRaw, featuredRaw, bestSellingAgg] = await Promise.all([
     prisma.product.findMany({
       where: { isActive: true },
       include: { category: true, brand: true },
