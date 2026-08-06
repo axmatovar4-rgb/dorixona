@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { format } from "date-fns";
 import { auth } from "@/lib/auth";
@@ -7,6 +8,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ORDER_STATUS_LABELS, ORDER_STATUS_VARIANT } from "@/lib/order-labels";
 import { AddNoteForm } from "@/modules/crm/components/add-note-form";
+
+export const metadata: Metadata = { title: "Mijoz tafsilotlari" };
 
 export default async function CrmDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;

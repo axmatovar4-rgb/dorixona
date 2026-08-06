@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { format, addDays } from "date-fns";
 import { prisma } from "@/lib/prisma";
@@ -11,6 +12,8 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+
+export const metadata: Metadata = { title: "Ogohlantirishlar" };
 
 export default async function AlertsPage() {
   const now = new Date();

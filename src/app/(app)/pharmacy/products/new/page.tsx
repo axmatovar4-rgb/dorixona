@@ -1,8 +1,11 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { can } from "@/lib/rbac";
 import { ProductForm } from "@/modules/pharmacy/components/product-form";
+
+export const metadata: Metadata = { title: "Yangi dori" };
 
 export default async function NewProductPage() {
   const session = await auth();

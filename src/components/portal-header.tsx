@@ -63,7 +63,7 @@ export function PortalHeader({ customerName }: { customerName: string | null }) 
 
         <Button
           className="hidden shrink-0 gap-1.5 rounded-full sm:flex"
-          render={<Link href="/catalog" />}
+          render={<Link href="/shop#catalog" />}
         >
           <Pill className="h-4 w-4" />
           Dorixona

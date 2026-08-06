@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { addDays } from "date-fns";
 import {
@@ -13,6 +14,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ROLE_LABELS } from "@/lib/role-labels";
 import { auth } from "@/lib/auth";
 import { can } from "@/lib/rbac";
+
+export const metadata: Metadata = { title: "Boshqaruv paneli" };
 
 export default async function DashboardPage() {
   const session = await auth();

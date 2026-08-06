@@ -1,5 +1,8 @@
+import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { MovementsTable } from "./movements-table";
+
+export const metadata: Metadata = { title: "Harakatlar tarixi" };
 
 export default async function MovementsPage() {
   const warehouses = await prisma.warehouse.findMany({ orderBy: { name: "asc" } });

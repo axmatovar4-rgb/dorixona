@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { format } from "date-fns";
 import { Package, ArrowRight, ChevronRight } from "lucide-react";
@@ -8,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { PageContainer } from "@/modules/customer/components/section";
 import { ORDER_STATUS_LABELS, ORDER_STATUS_VARIANT } from "@/lib/order-labels";
 import { checkExpiryForCustomer } from "@/lib/expiry-check";
+
+export const metadata: Metadata = { title: "Buyurtmalarim" };
 
 export default async function OrdersPage() {
   const session = await auth();

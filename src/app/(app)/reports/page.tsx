@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { startOfMonth, subMonths, addDays } from "date-fns";
 import { auth } from "@/lib/auth";
@@ -12,6 +13,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+
+export const metadata: Metadata = { title: "Hisobotlar" };
 
 export default async function ReportsPage() {
   const session = await auth();

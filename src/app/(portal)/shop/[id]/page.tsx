@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import {
@@ -20,6 +21,16 @@ import { AddToCart } from "@/modules/customer/components/add-to-cart";
 import { StockAlertButton } from "@/modules/customer/components/stock-alert-button";
 import { getFrequentlyBoughtWith } from "@/modules/customer/recommendations";
 import { StickyAddToCart } from "./sticky-add-to-cart";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const product = await prisma.product.findUnique({ where: { id }, select: { name: true } });
+  return { title: product?.name ?? "Dori" };
+}
 
 export default async function ShopProductPage({
   params,

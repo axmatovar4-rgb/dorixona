@@ -1,8 +1,16 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { AppSidebar } from "@/components/app-sidebar";
 import { AppTopbar } from "@/components/app-topbar";
 import { ROLE_LABELS } from "@/lib/role-labels";
+
+export const metadata: Metadata = {
+  title: {
+    default: "PharmCare ERP",
+    template: "%s — PharmCare ERP",
+  },
+};
 
 export default async function AppLayout({
   children,

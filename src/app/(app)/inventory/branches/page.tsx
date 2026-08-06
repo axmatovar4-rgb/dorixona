@@ -1,7 +1,10 @@
+import type { Metadata } from "next";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { can } from "@/lib/rbac";
 import { BranchManager } from "@/modules/inventory/components/branch-manager";
+
+export const metadata: Metadata = { title: "Filiallar" };
 
 export default async function BranchesPage() {
   const session = await auth();

@@ -1,8 +1,11 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { can } from "@/lib/rbac";
 import { StockOutForm } from "@/modules/inventory/components/stock-out-form";
+
+export const metadata: Metadata = { title: "Chiqim" };
 
 export default async function StockOutPage() {
   const session = await auth();

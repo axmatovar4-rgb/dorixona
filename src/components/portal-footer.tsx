@@ -6,7 +6,7 @@ const COLUMNS = [
   {
     title: "Do'kon",
     links: [
-      { label: "Barcha dorilar", href: "/catalog" },
+      { label: "Barcha dorilar", href: "/shop#catalog" },
       { label: "Savat", href: "/cart" },
       { label: "Buyurtmalarim", href: "/orders" },
     ],

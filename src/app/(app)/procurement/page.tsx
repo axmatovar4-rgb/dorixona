@@ -1,9 +1,12 @@
+import type { Metadata } from "next";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { canAsync } from "@/lib/rbac-modules";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PurchaseOrderForm } from "@/modules/procurement/components/purchase-order-form";
 import { PurchaseOrderList } from "@/modules/procurement/components/purchase-order-list";
+
+export const metadata: Metadata = { title: "Xaridlar" };
 
 export default async function ProcurementPage() {
   const session = await auth();

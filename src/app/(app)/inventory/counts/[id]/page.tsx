@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { format } from "date-fns";
 import { auth } from "@/lib/auth";
@@ -6,6 +7,8 @@ import { can } from "@/lib/rbac";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CountDetailClient } from "@/modules/inventory/components/count-detail-client";
+
+export const metadata: Metadata = { title: "Inventarizatsiya tafsilotlari" };
 
 export default async function CountDetailPage({
   params,

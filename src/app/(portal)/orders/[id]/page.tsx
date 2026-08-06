@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { format } from "date-fns";
 import { CheckCircle2, Circle, Pill, MapPin, CreditCard } from "lucide-react";
@@ -14,6 +15,8 @@ import {
 } from "@/lib/order-labels";
 import { cn } from "@/lib/utils";
 import { ReorderButton } from "@/modules/customer/components/reorder-button";
+
+export const metadata: Metadata = { title: "Buyurtma tafsilotlari" };
 
 export default async function OrderDetailPage({
   params,

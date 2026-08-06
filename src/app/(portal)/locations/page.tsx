@@ -1,6 +1,9 @@
+import type { Metadata } from "next";
 import { MapPin, Phone, Building2 } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { PageContainer } from "@/modules/customer/components/section";
+
+export const metadata: Metadata = { title: "Filiallar" };
 
 export default async function LocationsPage() {
   const branches = await prisma.branch.findMany({

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { PageContainer } from "@/modules/customer/components/section";
 
 const FAQS = [
@@ -22,6 +23,8 @@ const FAQS = [
     a: "Bunday holatda buyurtma raqamingiz bilan qo'llab-quvvatlash xizmatimizga murojaat qiling — \"Qaytarish siyosati\" sahifasida batafsil ma'lumot bor.",
   },
 ];
+
+export const metadata: Metadata = { title: "Ko'p so'raladigan savollar" };
 
 export default function FaqPage() {
   return (

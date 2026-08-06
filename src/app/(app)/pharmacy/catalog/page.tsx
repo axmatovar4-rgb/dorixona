@@ -1,9 +1,12 @@
+import type { Metadata } from "next";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { can } from "@/lib/rbac";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { LookupManager } from "@/modules/pharmacy/components/lookup-manager";
+
+export const metadata: Metadata = { title: "Katalog" };
 
 export default async function CatalogPage() {
   const session = await auth();

@@ -1,8 +1,11 @@
+import type { Metadata } from "next";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { canAsync } from "@/lib/rbac-modules";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmployeeManager } from "@/modules/hr/components/employee-manager";
+
+export const metadata: Metadata = { title: "Xodimlar" };
 
 export default async function HrPage() {
   const session = await auth();

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { format } from "date-fns";
@@ -19,6 +20,8 @@ import { AIBanner } from "@/modules/customer/components/ai-banner";
 import { ProfileForm } from "@/modules/customer/components/profile-form";
 import { ORDER_STATUS_LABELS, ORDER_STATUS_VARIANT } from "@/lib/order-labels";
 import { checkExpiryForCustomer } from "@/lib/expiry-check";
+
+export const metadata: Metadata = { title: "Mening profilim" };
 
 export default async function AccountPage() {
   const session = await auth();

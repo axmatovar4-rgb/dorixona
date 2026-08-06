@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { format } from "date-fns";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
@@ -14,6 +15,8 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { TransferForm } from "@/modules/inventory/components/transfer-form";
+
+export const metadata: Metadata = { title: "Transferlar" };
 
 export default async function TransfersPage() {
   const session = await auth();

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { ShieldCheck, Truck, Clock, HeartHandshake } from "lucide-react";
 import { PageContainer } from "@/modules/customer/components/section";
 
@@ -23,6 +24,8 @@ const VALUES = [
     body: "Farmatsevtlarimiz har bir mijozga individual yondashadi, dori haqida to'liq maslahat beradi.",
   },
 ];
+
+export const metadata: Metadata = { title: "Biz haqimizda" };
 
 export default function AboutPage() {
   return (

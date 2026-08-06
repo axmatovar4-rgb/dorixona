@@ -1,8 +1,11 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { can } from "@/lib/rbac";
 import { StockInForm } from "@/modules/inventory/components/stock-in-form";
+
+export const metadata: Metadata = { title: "Kirim" };
 
 export default async function StockInPage() {
   const session = await auth();

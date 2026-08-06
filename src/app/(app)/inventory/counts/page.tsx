@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { format } from "date-fns";
 import { redirect } from "next/navigation";
@@ -15,6 +16,8 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { StartCountForm } from "@/modules/inventory/components/start-count-form";
+
+export const metadata: Metadata = { title: "Inventarizatsiya" };
 
 export default async function CountsPage() {
   const session = await auth();

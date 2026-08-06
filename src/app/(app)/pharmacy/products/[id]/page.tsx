@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { differenceInCalendarDays, format } from "date-fns";
@@ -27,6 +28,8 @@ const MOVEMENT_LABELS: Record<string, string> = {
   ADJUSTMENT: "Tuzatish",
   RETURN: "Qaytarish",
 };
+
+export const metadata: Metadata = { title: "Dori tafsilotlari" };
 
 export default async function ProductDetailPage({
   params,

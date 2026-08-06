@@ -1,7 +1,10 @@
+import type { Metadata } from "next";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { PageContainer } from "@/modules/customer/components/section";
 import { CheckoutForm } from "./checkout-form";
+
+export const metadata: Metadata = { title: "Buyurtmani rasmiylashtirish" };
 
 export default async function CheckoutPage() {
   const session = await auth();

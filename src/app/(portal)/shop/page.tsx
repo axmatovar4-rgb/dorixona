@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { Hero } from "./hero";
 import { CategoryStrip } from "./category-strip";
@@ -40,6 +41,8 @@ async function toCardData(
     inStock: (stockMap.get(p.id) ?? 0) > 0,
   }));
 }
+
+export const metadata: Metadata = { title: "Bosh sahifa" };
 
 export default async function ShopHomePage({
   searchParams,

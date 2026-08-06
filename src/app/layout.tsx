@@ -16,7 +16,10 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "PharmCare ERP",
+  title: {
+    default: "PharmCare — Onlayn dorixona",
+    template: "%s — PharmCare",
+  },
   description: "Dorixonalar tarmog'i uchun ERP tizimi",
 };
 

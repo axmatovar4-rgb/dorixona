@@ -1,8 +1,11 @@
+import type { Metadata } from "next";
 import { format } from "date-fns";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+
+export const metadata: Metadata = { title: "Bildirishnomalar" };
 
 export default async function NotificationsPage() {
   const session = await auth();

@@ -21,7 +21,7 @@ export const authConfig: NextAuthConfig = {
     },
     authorized({ auth, request }) {
       const { pathname } = request.nextUrl;
-      const publicExact = ["/", "/shop", "/catalog", "/about", "/faq", "/delivery", "/returns", "/locations", "/partners"];
+      const publicExact = ["/", "/shop", "/about", "/faq", "/delivery", "/returns", "/locations", "/partners"];
       const isPublicPortalPath = publicExact.includes(pathname) || pathname.startsWith("/shop/");
       if (isPublicPortalPath) return true;
       return !!auth?.user;

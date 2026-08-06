@@ -1,7 +1,10 @@
+import type { Metadata } from "next";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { PageContainer } from "@/modules/customer/components/section";
 import { AddressManager } from "@/modules/customer/components/address-manager";
+
+export const metadata: Metadata = { title: "Manzillarim" };
 
 export default async function AddressesPage() {
   const session = await auth();

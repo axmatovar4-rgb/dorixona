@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { PageContainer } from "@/modules/customer/components/section";
 
 const SECTIONS = [
@@ -18,6 +19,8 @@ const SECTIONS = [
     body: "Qaytarish tasdiqlangandan so'ng, to'lov summasi 3-5 ish kuni ichida to'lov usulingizga qaytariladi.",
   },
 ];
+
+export const metadata: Metadata = { title: "Qaytarish siyosati" };
 
 export default function ReturnsPage() {
   return (

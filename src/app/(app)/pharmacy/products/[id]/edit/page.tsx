@@ -1,8 +1,11 @@
+import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { can } from "@/lib/rbac";
 import { ProductForm } from "@/modules/pharmacy/components/product-form";
+
+export const metadata: Metadata = { title: "Dorini tahrirlash" };
 
 export default async function EditProductPage({
   params,

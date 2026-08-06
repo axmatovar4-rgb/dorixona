@@ -1,8 +1,11 @@
+import type { Metadata } from "next";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { canAsync } from "@/lib/rbac-modules";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { InvoiceManager } from "@/modules/accounting/components/invoice-manager";
+
+export const metadata: Metadata = { title: "Accounting" };
 
 export default async function AccountingPage() {
   const session = await auth();

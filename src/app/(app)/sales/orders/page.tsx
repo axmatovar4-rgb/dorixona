@@ -1,7 +1,10 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { can } from "@/lib/rbac";
 import { OrdersTable } from "./orders-table";
+
+export const metadata: Metadata = { title: "Buyurtmalar" };
 
 export default async function SalesOrdersPage() {
   const session = await auth();

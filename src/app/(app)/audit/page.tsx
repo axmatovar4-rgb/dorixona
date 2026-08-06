@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { format } from "date-fns";
 import { auth } from "@/lib/auth";
@@ -11,6 +12,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+
+export const metadata: Metadata = { title: "Audit jurnali" };
 
 export default async function AuditPage() {
   const session = await auth();

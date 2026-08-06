@@ -1,7 +1,10 @@
+import type { Metadata } from "next";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { can } from "@/lib/rbac";
 import { WarehouseManager } from "@/modules/inventory/components/warehouse-manager";
+
+export const metadata: Metadata = { title: "Omborlar" };
 
 export default async function WarehousesPage() {
   const session = await auth();

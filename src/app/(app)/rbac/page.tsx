@@ -1,7 +1,10 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RbacGrid } from "@/modules/rbac-admin/components/rbac-grid";
+
+export const metadata: Metadata = { title: "RBAC" };
 
 export default async function RbacPage() {
   const session = await auth();

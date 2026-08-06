@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Truck, Clock, MapPin, Wallet } from "lucide-react";
 import { PageContainer } from "@/modules/customer/components/section";
 import { DELIVERY_FEE } from "@/modules/customer/constants";
@@ -24,6 +25,8 @@ const STEPS = [
     body: "Buyurtmangiz filialdan kuryerimiz orqali yuboriladi, holatini \"Buyurtmalarim\" bo'limidan kuzatib borishingiz mumkin.",
   },
 ];
+
+export const metadata: Metadata = { title: "Yetkazib berish" };
 
 export default function DeliveryPage() {
   return (

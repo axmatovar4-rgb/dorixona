@@ -1,5 +1,6 @@
 "use client";
 
+import * as React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Minus, Plus, Trash2, ShoppingBag, ArrowRight, Pill } from "lucide-react";
@@ -13,6 +14,10 @@ import { PageContainer } from "@/modules/customer/components/section";
 export default function CartPage() {
   const router = useRouter();
   const { items, setQuantity, removeItem, subtotal, requiresPrescription } = useCart();
+
+  React.useEffect(() => {
+    document.title = "Savat — PharmCare";
+  }, []);
 
   if (items.length === 0) {
     return (

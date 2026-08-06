@@ -1,8 +1,11 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SettingsForm } from "@/modules/settings/components/settings-form";
+
+export const metadata: Metadata = { title: "Sozlamalar" };
 
 export default async function SettingsPage() {
   const session = await auth();

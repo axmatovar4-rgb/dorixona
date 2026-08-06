@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { format } from "date-fns";
 import { auth } from "@/lib/auth";
@@ -16,6 +17,8 @@ import {
 } from "@/components/ui/table";
 import { PAYMENT_METHOD_LABELS } from "@/lib/order-labels";
 import { StatusControl } from "./status-control";
+
+export const metadata: Metadata = { title: "Buyurtma tafsilotlari" };
 
 export default async function StaffOrderDetailPage({
   params,

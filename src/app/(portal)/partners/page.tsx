@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Building2, Handshake, Phone, Mail } from "lucide-react";
 import { PageContainer } from "@/modules/customer/components/section";
 
@@ -13,6 +14,8 @@ const OPTIONS = [
     body: "Hududingizda PharmCare filialini ochish yoki franshiza bo'yicha hamkorlik qilish istagida bo'lsangiz, ariza yuboring.",
   },
 ];
+
+export const metadata: Metadata = { title: "Hamkorlik" };
 
 export default function PartnersPage() {
   return (

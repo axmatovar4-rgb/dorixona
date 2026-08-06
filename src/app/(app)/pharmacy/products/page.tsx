@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { Plus } from "lucide-react";
 import { auth } from "@/lib/auth";
@@ -6,6 +7,8 @@ import { can } from "@/lib/rbac";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ProductsTable } from "./products-table";
+
+export const metadata: Metadata = { title: "Dorilar" };
 
 export default async function ProductsPage() {
   const session = await auth();
