@@ -210,6 +210,95 @@ async function main() {
     });
   }
 
+  // ---------- RolePermission defaults (new modules) ----------
+  const ALL_ACTIONS = ["view", "create", "edit", "delete"];
+  const WRITE_ACTIONS = ["view", "create", "edit"];
+  const READ_ACTIONS = ["view"];
+
+  const NEW_MODULES = [
+    "crm",
+    "procurement",
+    "finance",
+    "hr",
+    "payroll",
+    "accounting",
+    "supplierManagement",
+    "branchManagement",
+    "reports",
+    "notifications",
+    "settings",
+    "audit",
+  ] as const;
+
+  const ROLE_MODULE_ACTIONS: Record<string, Record<string, string[]>> = {
+    SUPER_ADMIN: Object.fromEntries(NEW_MODULES.map((m) => [m, ALL_ACTIONS])),
+    ADMIN: Object.fromEntries(NEW_MODULES.map((m) => [m, ALL_ACTIONS])),
+    PHARMACIST: {
+      crm: READ_ACTIONS,
+      procurement: READ_ACTIONS,
+      supplierManagement: READ_ACTIONS,
+      reports: READ_ACTIONS,
+      notifications: READ_ACTIONS,
+    },
+    WAREHOUSE_MANAGER: {
+      procurement: WRITE_ACTIONS,
+      supplierManagement: WRITE_ACTIONS,
+      branchManagement: READ_ACTIONS,
+      reports: READ_ACTIONS,
+      notifications: READ_ACTIONS,
+    },
+    CASHIER: {
+      crm: READ_ACTIONS,
+      reports: READ_ACTIONS,
+      notifications: READ_ACTIONS,
+    },
+    MANAGER: {
+      crm: WRITE_ACTIONS,
+      procurement: WRITE_ACTIONS,
+      supplierManagement: WRITE_ACTIONS,
+      branchManagement: WRITE_ACTIONS,
+      reports: READ_ACTIONS,
+      notifications: READ_ACTIONS,
+      finance: READ_ACTIONS,
+      accounting: READ_ACTIONS,
+      hr: READ_ACTIONS,
+      payroll: READ_ACTIONS,
+    },
+    ACCOUNTANT: {
+      finance: ALL_ACTIONS,
+      accounting: ALL_ACTIONS,
+      reports: READ_ACTIONS,
+      notifications: READ_ACTIONS,
+    },
+    HR: {
+      hr: ALL_ACTIONS,
+      payroll: ALL_ACTIONS,
+      crm: READ_ACTIONS,
+      notifications: READ_ACTIONS,
+    },
+  };
+
+  const permissionRows: { role: string; module: string; action: string; allowed: boolean }[] = [];
+  for (const role of Object.keys(ROLE_MODULE_ACTIONS)) {
+    for (const moduleName of NEW_MODULES) {
+      const allowedActions = ROLE_MODULE_ACTIONS[role][moduleName] ?? [];
+      for (const action of ALL_ACTIONS) {
+        permissionRows.push({
+          role,
+          module: moduleName,
+          action,
+          allowed: allowedActions.includes(action),
+        });
+      }
+    }
+  }
+
+  await prisma.rolePermission.createMany({
+    data: permissionRows as never,
+    skipDuplicates: true,
+  });
+  console.log(`RolePermission rows seeded: ${permissionRows.length}`);
+
   console.log("Seed complete.");
   console.log(`Super Admin: ${superAdmin.email}`);
   console.log(`Pharmacist: ${pharmacist.email}`);

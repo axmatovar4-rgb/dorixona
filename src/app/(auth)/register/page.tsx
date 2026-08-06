@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
+import { AuthBackground } from "@/components/auth-background";
 import { RegisterForm } from "./register-form";
 
 export default async function RegisterPage() {
@@ -9,8 +10,8 @@ export default async function RegisterPage() {
   }
 
   return (
-    <div className="portal-theme flex min-h-screen items-center justify-center bg-muted/30 p-4">
+    <AuthBackground>
       <RegisterForm />
-    </div>
+    </AuthBackground>
   );
 }

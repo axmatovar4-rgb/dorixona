@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { Pill, Phone, MessageCircle, Send } from "lucide-react";
+import { Phone, MessageCircle, Send } from "lucide-react";
+import { LogoMark } from "@/components/logo";
 
 const COLUMNS = [
   {
@@ -35,9 +36,7 @@ export function PortalFooter() {
         <div className="grid grid-cols-2 gap-8 sm:grid-cols-4">
           <div className="col-span-2 flex flex-col gap-3 sm:col-span-1">
             <Link href="/shop" className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                <Pill className="h-4 w-4" />
-              </div>
+              <LogoMark className="h-8 w-8" />
               <span className="text-lg font-bold">PharmCare</span>
             </Link>
             <p className="text-sm text-muted-foreground">

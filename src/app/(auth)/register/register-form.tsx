@@ -3,7 +3,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import { Loader2, UserPlus } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { registerSchema, type RegisterInput } from "@/modules/customer/schemas";
 import { registerCustomer } from "@/modules/customer/actions";
 import { Button } from "@/components/ui/button";
@@ -39,11 +39,8 @@ export function RegisterForm() {
   }
 
   return (
-    <Card className="w-full max-w-sm">
+    <Card className="portal-shadow-lg w-full max-w-sm border-primary/10 backdrop-blur-sm">
       <CardHeader className="items-center text-center">
-        <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground">
-          <UserPlus className="h-6 w-6" />
-        </div>
         <CardTitle className="text-xl">Ro&apos;yxatdan o&apos;tish</CardTitle>
         <CardDescription>Mijoz sifatida hisob yarating</CardDescription>
       </CardHeader>

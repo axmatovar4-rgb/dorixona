@@ -3,24 +3,23 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { ChevronDown, Pill } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NAV_ITEMS } from "@/components/nav-data";
+import { LogoMark } from "@/components/logo";
 
 export function AppSidebar({ className }: { className?: string }) {
   const pathname = usePathname();
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({
-    Pharmacy: pathname.startsWith("/pharmacy"),
-    Inventory: pathname.startsWith("/inventory"),
-    "Sales / POS": pathname.startsWith("/sales"),
+    Dorixona: pathname.startsWith("/pharmacy"),
+    Ombor: pathname.startsWith("/inventory"),
+    Sotuvlar: pathname.startsWith("/sales"),
   });
 
   return (
     <nav className={cn("flex h-full w-64 flex-col border-r bg-sidebar", className)}>
       <div className="flex h-14 items-center gap-2 border-b px-4">
-        <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground">
-          <Pill className="h-4 w-4" />
-        </div>
+        <LogoMark className="h-8 w-8 shrink-0" />
         <span className="font-semibold">PharmCare ERP</span>
       </div>
 

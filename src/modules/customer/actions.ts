@@ -18,6 +18,7 @@ import {
 } from "@/modules/customer/schemas";
 import { DELIVERY_FEE } from "@/modules/customer/constants";
 import { listNotifications, getUnreadCount, markAllRead } from "@/lib/notifications";
+import { notifyRoles } from "@/lib/staff-notifications";
 
 export async function registerCustomer(input: RegisterInput) {
   const parsed = registerSchema.safeParse(input);
@@ -258,6 +259,12 @@ export async function createOrder(input: CheckoutInput) {
     }
     throw err;
   }
+
+  await notifyRoles(["CASHIER", "MANAGER", "SUPER_ADMIN"], {
+    type: "NEW_ORDER",
+    title: "Yangi buyurtma",
+    body: `#${orderId.slice(-8).toUpperCase()} qabul qilindi`,
+  });
 
   revalidatePath("/orders");
   return { success: true as const, orderId };

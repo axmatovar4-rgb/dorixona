@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
+import { AuthBackground } from "@/components/auth-background";
 import { LoginForm } from "./login-form";
 
 export default async function LoginPage() {
@@ -9,8 +10,8 @@ export default async function LoginPage() {
   }
 
   return (
-    <div className="portal-theme flex min-h-screen items-center justify-center bg-muted/30 p-4">
+    <AuthBackground>
       <LoginForm />
-    </div>
+    </AuthBackground>
   );
 }

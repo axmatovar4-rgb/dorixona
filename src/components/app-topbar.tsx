@@ -16,6 +16,7 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ModeToggle } from "@/components/mode-toggle";
 import { AppSidebar } from "@/components/app-sidebar";
+import { StaffNotificationBell } from "@/modules/staff/components/staff-notification-bell";
 import { signOutAction } from "@/lib/actions";
 import { cn } from "@/lib/utils";
 
@@ -54,6 +55,7 @@ export function AppTopbar({
       </div>
 
       <div className="flex items-center gap-2">
+        <StaffNotificationBell />
         <ModeToggle />
         <DropdownMenu>
           <DropdownMenuTrigger

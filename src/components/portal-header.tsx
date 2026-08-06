@@ -4,7 +4,6 @@ import * as React from "react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import {
-  Pill,
   Search,
   ShoppingBag,
   Sparkles,
@@ -13,6 +12,7 @@ import {
   MapPin,
   LogOut,
 } from "lucide-react";
+import { LogoMark } from "@/components/logo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -56,9 +56,7 @@ export function PortalHeader({ customerName }: { customerName: string }) {
     <header className="sticky top-0 z-40 border-b bg-background/80 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-4 sm:px-6">
         <Link href="/shop" className="flex shrink-0 items-center gap-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm">
-            <Pill className="h-5 w-5" />
-          </div>
+          <LogoMark className="h-9 w-9" />
           <span className="hidden text-lg font-bold tracking-tight sm:inline">PharmCare</span>
         </Link>
 
