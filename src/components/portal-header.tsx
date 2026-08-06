@@ -11,6 +11,7 @@ import {
   User,
   MapPin,
   LogOut,
+  Pill,
 } from "lucide-react";
 import { LogoMark } from "@/components/logo";
 import { Button } from "@/components/ui/button";
@@ -59,6 +60,14 @@ export function PortalHeader({ customerName }: { customerName: string | null }) 
           <LogoMark className="h-9 w-9" />
           <span className="hidden text-lg font-bold tracking-tight sm:inline">PharmCare</span>
         </Link>
+
+        <Button
+          className="hidden shrink-0 gap-1.5 rounded-full sm:flex"
+          render={<Link href="/catalog" />}
+        >
+          <Pill className="h-4 w-4" />
+          Dorixona
+        </Button>
 
         <form onSubmit={handleSearch} className="mx-auto hidden w-full max-w-md md:block">
           <div className="relative">
@@ -147,14 +156,9 @@ export function PortalHeader({ customerName }: { customerName: string | null }) 
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <div className="ml-1 flex items-center gap-2">
-              <Button variant="ghost" className="rounded-full" render={<Link href="/login" />}>
-                Kirish
-              </Button>
-              <Button className="rounded-full" render={<Link href="/register" />}>
-                Ro&apos;yxatdan o&apos;tish
-              </Button>
-            </div>
+            <Button className="ml-1 rounded-full" render={<Link href="/login" />}>
+              Tizimga kirish
+            </Button>
           )}
         </div>
       </div>
