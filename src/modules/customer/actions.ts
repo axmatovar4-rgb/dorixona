@@ -162,7 +162,7 @@ export async function createOrder(input: CheckoutInput) {
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "Ma'lumotlar noto'g'ri" };
   }
-  const { addressId, paymentMethod, prescriptionImageUrl, items } = parsed.data;
+  const { addressId, paymentMethod, items } = parsed.data;
 
   const address = await prisma.address.findUnique({ where: { id: addressId } });
   if (!address || address.customerId !== session.user.id) {
@@ -177,9 +177,6 @@ export async function createOrder(input: CheckoutInput) {
   }
 
   const requiresPrescription = products.some((p) => p.prescriptionRequired);
-  if (requiresPrescription && !prescriptionImageUrl) {
-    return { error: "Retsept talab qilinadigan dori mavjud — retsept rasmini yuklang" };
-  }
 
   let subtotal = 0;
   const orderItems = items.map((item) => {
@@ -208,7 +205,6 @@ export async function createOrder(input: CheckoutInput) {
           deliveryFee: DELIVERY_FEE,
           total,
           requiresPrescription,
-          prescriptionImageUrl: prescriptionImageUrl || null,
           items: { create: orderItems },
         },
         include: { items: true },

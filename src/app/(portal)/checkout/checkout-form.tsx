@@ -10,7 +10,6 @@ import {
   Plus,
   Banknote,
   CreditCard,
-  Upload,
   Check,
   ArrowRight,
   ShoppingBag,
@@ -44,7 +43,7 @@ const PAYMENT_OPTIONS: { value: (typeof PAYMENT_METHODS)[number]; label: string;
 
 export function CheckoutForm({ addresses }: { addresses: Address[] }) {
   const router = useRouter();
-  const { items, subtotal, requiresPrescription, clear } = useCart();
+  const { items, subtotal, clear } = useCart();
 
   const [addressId, setAddressId] = React.useState(
     addresses.find((a) => a.isDefault)?.id ?? addresses[0]?.id ?? ""
@@ -63,7 +62,6 @@ export function CheckoutForm({ addresses }: { addresses: Address[] }) {
   const [paymentMethod, setPaymentMethod] =
     React.useState<(typeof PAYMENT_METHODS)[number]>("CASH_ON_DELIVERY");
   const [onlinePaymentValid, setOnlinePaymentValid] = React.useState(false);
-  const [prescriptionImageUrl, setPrescriptionImageUrl] = React.useState("");
   const [submitting, setSubmitting] = React.useState(false);
 
   const total = subtotal + DELIVERY_FEE;
@@ -92,21 +90,9 @@ export function CheckoutForm({ addresses }: { addresses: Address[] }) {
     setNewAddress("");
   }
 
-  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => setPrescriptionImageUrl(reader.result as string);
-    reader.readAsDataURL(file);
-  }
-
   async function handleSubmit() {
     if (!addressId) {
       toast.error("Yetkazib berish manzilini tanlang");
-      return;
-    }
-    if (requiresPrescription && !prescriptionImageUrl) {
-      toast.error("Retsept rasmini yuklang");
       return;
     }
     if (isOnlinePayment && !onlinePaymentValid) {
@@ -117,7 +103,6 @@ export function CheckoutForm({ addresses }: { addresses: Address[] }) {
     const result = await createOrder({
       addressId,
       paymentMethod,
-      prescriptionImageUrl,
       items: items.map((i) => ({ productId: i.productId, quantity: i.quantity })),
     });
     setSubmitting(false);
@@ -248,22 +233,6 @@ export function CheckoutForm({ addresses }: { addresses: Address[] }) {
               amount={total}
               onValidChange={setOnlinePaymentValid}
             />
-          )}
-
-          {requiresPrescription && (
-            <div className="mt-4 flex flex-col gap-2 border-t pt-4">
-              <h2 className="flex items-center gap-2 font-medium">
-                <Upload className="h-4 w-4 text-primary" />
-                Retsept rasmi
-              </h2>
-              <p className="text-xs text-muted-foreground">
-                Savatingizda retsept talab qilinadigan dori bor. Retsept rasmini yuklang.
-              </p>
-              <input type="file" accept="image/*,.pdf" onChange={handleFileChange} className="text-sm" />
-              {prescriptionImageUrl && (
-                <p className="text-xs text-emerald-600 dark:text-emerald-400">Fayl yuklandi</p>
-              )}
-            </div>
           )}
         </div>
       </div>
