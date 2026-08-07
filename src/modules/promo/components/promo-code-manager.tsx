@@ -3,9 +3,10 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Plus, Loader2, Trash2 } from "lucide-react";
+import { Plus, Loader2, Trash2, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import {
   Table,
@@ -26,7 +27,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { createPromoCode, deletePromoCode, togglePromoCodeActive } from "@/modules/promo/actions";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { createPromoCode, updatePromoCode, deletePromoCode, togglePromoCodeActive } from "@/modules/promo/actions";
 
 type Product = { id: string; name: string };
 
@@ -53,8 +55,40 @@ export function PromoCodeManager({
   const [selectedProductIds, setSelectedProductIds] = React.useState<string[]>([]);
   const [pending, setPending] = React.useState(false);
 
+  const [editing, setEditing] = React.useState<PromoCode | null>(null);
+  const [editDiscountPercent, setEditDiscountPercent] = React.useState("10");
+  const [editProductIds, setEditProductIds] = React.useState<string[]>([]);
+  const [editPending, setEditPending] = React.useState(false);
+
   function toggleProduct(id: string) {
     setSelectedProductIds((prev) => (prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id]));
+  }
+
+  function toggleEditProduct(id: string) {
+    setEditProductIds((prev) => (prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id]));
+  }
+
+  function openEdit(promo: PromoCode) {
+    setEditing(promo);
+    setEditDiscountPercent(String(promo.discountPercent));
+    setEditProductIds(promo.products.map((p) => p.id));
+  }
+
+  async function handleEditSave() {
+    if (!editing) return;
+    setEditPending(true);
+    const result = await updatePromoCode(editing.id, {
+      discountPercent: Number(editDiscountPercent),
+      productIds: editProductIds,
+    });
+    setEditPending(false);
+    if (result?.error) {
+      toast.error(result.error);
+      return;
+    }
+    toast.success("Yangilandi");
+    setEditing(null);
+    router.refresh();
   }
 
   async function handleAdd(e: React.FormEvent) {
@@ -172,7 +206,10 @@ export function PromoCodeManager({
                   )}
                 </TableCell>
                 {canManage && (
-                  <TableCell>
+                  <TableCell className="flex items-center gap-1">
+                    <Button variant="ghost" size="icon-sm" onClick={() => openEdit(p)}>
+                      <Pencil className="h-4 w-4" />
+                    </Button>
                     <AlertDialog>
                       <AlertDialogTrigger
                         render={
@@ -206,6 +243,54 @@ export function PromoCodeManager({
           )}
         </TableBody>
       </Table>
+
+      <Dialog open={!!editing} onOpenChange={(open) => !open && setEditing(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>&quot;{editing?.code}&quot; kodini tahrirlash</DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-1.5">
+              <Label>Chegirma (%)</Label>
+              <Input
+                type="number"
+                min={1}
+                max={90}
+                value={editDiscountPercent}
+                onChange={(e) => setEditDiscountPercent(e.target.value)}
+                className="w-28"
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label>
+                Qaysi dorilarga tegishli{" "}
+                <span className="font-normal text-muted-foreground">
+                  (hech biri tanlanmasa — barcha savatga qo&apos;llanadi)
+                </span>
+              </Label>
+              <div className="flex max-h-52 flex-col gap-1 overflow-y-auto rounded-lg border p-2">
+                {products.map((p) => (
+                  <label key={p.id} className="flex items-center gap-2 rounded px-1.5 py-1 text-sm hover:bg-muted">
+                    <input
+                      type="checkbox"
+                      checked={editProductIds.includes(p.id)}
+                      onChange={() => toggleEditProduct(p.id)}
+                      className="h-4 w-4 accent-primary"
+                    />
+                    {p.name}
+                  </label>
+                ))}
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button onClick={handleEditSave} disabled={editPending} className="gap-1.5">
+              {editPending && <Loader2 className="h-4 w-4 animate-spin" />}
+              Saqlash
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -34,6 +34,29 @@ export async function createPromoCode(input: PromoCodeInput) {
   return { success: true as const };
 }
 
+export async function updatePromoCode(id: string, input: { discountPercent: number; productIds: string[] }) {
+  const session = await auth();
+  if (!session?.user || session.user.type !== "STAFF" || !(await canAsync(session.user.role, "promoCodes", "edit"))) {
+    return { error: "Sizda ruxsat yo'q" };
+  }
+  const discountPercent = Math.round(input.discountPercent);
+  if (!Number.isFinite(discountPercent) || discountPercent < 1 || discountPercent > 90) {
+    return { error: "Chegirma 1 dan 90 gacha bo'lishi kerak" };
+  }
+
+  await prisma.promoCode.update({
+    where: { id },
+    data: {
+      discountPercent,
+      products: { set: input.productIds.map((productId) => ({ id: productId })) },
+    },
+  });
+
+  await logAudit({ userId: session.user.id, action: "UPDATE", entityType: "PromoCode", entityId: id });
+  revalidatePath("/promo-codes");
+  return { success: true as const };
+}
+
 export async function togglePromoCodeActive(id: string, isActive: boolean) {
   const session = await auth();
   if (!session?.user || session.user.type !== "STAFF" || !(await canAsync(session.user.role, "promoCodes", "edit"))) {
