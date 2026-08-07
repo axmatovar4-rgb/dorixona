@@ -8,7 +8,6 @@ import {
   Loader2,
   MapPin,
   Plus,
-  Banknote,
   CreditCard,
   Check,
   ArrowRight,
@@ -20,6 +19,7 @@ import { DELIVERY_FEE } from "@/modules/customer/constants";
 import { createOrder, createAddress } from "@/modules/customer/actions";
 import { detectCurrentAddress } from "@/modules/customer/geolocation";
 import { PAYMENT_METHODS } from "@/modules/customer/schemas";
+import { PaymeLogo, ClickLogo, HumoLogo, UzcardLogo, CashCoinIcon } from "@/components/payment-logos";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -35,12 +35,16 @@ type Address = {
   isDefault: boolean;
 };
 
-const PAYMENT_OPTIONS: { value: (typeof PAYMENT_METHODS)[number]; label: string; icon: typeof Banknote }[] = [
-  { value: "CASH_ON_DELIVERY", label: "Naqd (yetkazishda)", icon: Banknote },
-  { value: "CLICK", label: "Click", icon: CreditCard },
-  { value: "PAYME", label: "Payme", icon: CreditCard },
-  { value: "UZCARD", label: "Uzcard", icon: CreditCard },
-  { value: "HUMO", label: "Humo", icon: CreditCard },
+const PAYMENT_OPTIONS: {
+  value: (typeof PAYMENT_METHODS)[number];
+  label: string;
+  logo: (props: { className?: string }) => React.ReactElement;
+}[] = [
+  { value: "CASH_ON_DELIVERY", label: "Naqd (yetkazishda)", logo: CashCoinIcon },
+  { value: "CLICK", label: "Click", logo: ClickLogo },
+  { value: "PAYME", label: "Payme", logo: PaymeLogo },
+  { value: "UZCARD", label: "Uzcard", logo: UzcardLogo },
+  { value: "HUMO", label: "Humo", logo: HumoLogo },
 ];
 
 export function CheckoutForm({ addresses }: { addresses: Address[] }) {
@@ -239,18 +243,18 @@ export function CheckoutForm({ addresses }: { addresses: Address[] }) {
                   setOnlinePaymentValid(false);
                 }}
                 className={cn(
-                  "flex flex-col items-center gap-2 rounded-2xl border p-4 text-center text-sm font-medium transition-all hover:border-primary/40",
-                  paymentMethod === opt.value ? "border-primary bg-primary/5 text-primary" : "border-border"
+                  "flex flex-col items-center justify-center gap-2 rounded-2xl border bg-white p-4 text-center text-sm font-medium transition-all hover:border-primary/40",
+                  paymentMethod === opt.value ? "border-primary ring-2 ring-primary/20" : "border-border"
                 )}
               >
-                <opt.icon className="h-5 w-5" />
-                {opt.label}
+                <opt.logo className="max-w-full" />
+                {opt.value === "CASH_ON_DELIVERY" && <span>{opt.label}</span>}
               </button>
             ))}
           </div>
           {paymentMethod === "CASH_ON_DELIVERY" ? (
             <p className="mt-3 flex items-center gap-1.5 text-xs text-muted-foreground">
-              <Banknote className="h-3.5 w-3.5" />
+              <CashCoinIcon className="h-3.5 w-3.5" />
               Kuryer yetkazib berganda naqd pulda to&apos;laysiz.
             </p>
           ) : (
