@@ -65,6 +65,17 @@ export function UzcardLogo({ className }: LogoProps) {
   );
 }
 
+export function VisaLogo({ className }: LogoProps) {
+  return (
+    <svg viewBox="0 0 100 34" className={cn("h-6 w-auto", className)} aria-label="Visa">
+      <path d="M4 26c6-6 6-14 0-22 7 2 12 9 12 16.5S11 28 4 26Z" fill="#F7A823" />
+      <text x="14" y="25" fontFamily="Arial, sans-serif" fontWeight="800" fontStyle="italic" fontSize="24" fill="#1A3A8F" letterSpacing="-0.5">
+        VISA
+      </text>
+    </svg>
+  );
+}
+
 export function CashCoinIcon({ className }: LogoProps) {
   const gid = "coin-grad";
   return (

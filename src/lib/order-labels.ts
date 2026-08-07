@@ -25,6 +25,7 @@ export const PAYMENT_METHOD_LABELS: Record<PaymentMethod, string> = {
   PAYME: "Payme",
   UZCARD: "Uzcard",
   HUMO: "Humo",
+  VISA: "Visa",
 };
 
 export const ORDER_STATUS_FLOW: OrderStatus[] = [

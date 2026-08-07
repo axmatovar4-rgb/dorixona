@@ -32,7 +32,7 @@ export const addressSchema = z.object({
 });
 export type AddressInput = z.infer<typeof addressSchema>;
 
-export const PAYMENT_METHODS = ["CASH_ON_DELIVERY", "CLICK", "PAYME", "UZCARD", "HUMO"] as const;
+export const PAYMENT_METHODS = ["CASH_ON_DELIVERY", "CLICK", "PAYME", "UZCARD", "HUMO", "VISA"] as const;
 
 export const checkoutSchema = z.object({
   addressId: z.string().min(1, "Manzilni tanlang"),

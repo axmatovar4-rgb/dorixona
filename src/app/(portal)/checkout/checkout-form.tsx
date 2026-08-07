@@ -19,7 +19,7 @@ import { DELIVERY_FEE } from "@/modules/customer/constants";
 import { createOrder, createAddress } from "@/modules/customer/actions";
 import { detectCurrentAddress } from "@/modules/customer/geolocation";
 import { PAYMENT_METHODS } from "@/modules/customer/schemas";
-import { PaymeLogo, ClickLogo, HumoLogo, UzcardLogo, CashCoinIcon } from "@/components/payment-logos";
+import { PaymeLogo, ClickLogo, HumoLogo, UzcardLogo, VisaLogo, CashCoinIcon } from "@/components/payment-logos";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -45,6 +45,7 @@ const PAYMENT_OPTIONS: {
   { value: "PAYME", label: "Payme", logo: PaymeLogo },
   { value: "UZCARD", label: "Uzcard", logo: UzcardLogo },
   { value: "HUMO", label: "Humo", logo: HumoLogo },
+  { value: "VISA", label: "Visa", logo: VisaLogo },
 ];
 
 export function CheckoutForm({ addresses }: { addresses: Address[] }) {
