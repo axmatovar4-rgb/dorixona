@@ -16,6 +16,7 @@ export type MedicineCardData = {
   unit: string;
   dosage?: string | null;
   sellPrice: string | number;
+  oldPrice?: string | number | null;
   prescriptionRequired: boolean;
   imageUrl?: string | null;
   category?: string | null;
@@ -32,6 +33,9 @@ export function MedicineCard({
 }) {
   const { addItem } = useCart();
   const price = Number(product.sellPrice);
+  const oldPrice = product.oldPrice != null ? Number(product.oldPrice) : null;
+  const hasDiscount = oldPrice != null && oldPrice > price;
+  const discountPercent = hasDiscount ? Math.round(((oldPrice - price) / oldPrice) * 100) : 0;
   const rating = derivedRating(product.id);
 
   return (
@@ -55,11 +59,14 @@ export function MedicineCard({
           </div>
         )}
         <div className="absolute inset-x-0 top-0 flex items-start justify-between p-2.5">
-          {product.prescriptionRequired ? (
-            <Badge className="border-0 bg-foreground/80 text-background backdrop-blur-sm">Retsept</Badge>
-          ) : (
-            <span />
-          )}
+          <div className="flex flex-col gap-1">
+            {hasDiscount && (
+              <Badge className="border-0 bg-red-600 text-white">-{discountPercent}%</Badge>
+            )}
+            {product.prescriptionRequired && (
+              <Badge className="border-0 bg-foreground/80 text-background backdrop-blur-sm">Retsept</Badge>
+            )}
+          </div>
           {!product.inStock && (
             <Badge variant="destructive" className="border-0">
               Tugagan
@@ -77,10 +84,22 @@ export function MedicineCard({
           {product.dosage ? ` · ${product.dosage}` : ""}
         </Link>
         <RatingStars value={rating} />
-        <p className="mt-auto pt-2 text-xl font-bold tracking-tight">
-          {price.toLocaleString("uz-UZ")}
-          <span className="text-sm font-medium text-muted-foreground"> so&apos;m</span>
-        </p>
+        <div className="mt-auto flex flex-wrap items-baseline gap-x-2 pt-2">
+          <p
+            className={cn(
+              "text-xl font-bold tracking-tight",
+              hasDiscount && "text-red-600 dark:text-red-400"
+            )}
+          >
+            {price.toLocaleString("uz-UZ")}
+            <span className="text-sm font-medium text-muted-foreground"> so&apos;m</span>
+          </p>
+          {hasDiscount && (
+            <span className="text-sm text-muted-foreground line-through">
+              {oldPrice.toLocaleString("uz-UZ")}
+            </span>
+          )}
+        </div>
 
         <div className="mt-3 flex gap-2">
           <Button

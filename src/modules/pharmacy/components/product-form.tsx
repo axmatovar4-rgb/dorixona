@@ -63,6 +63,7 @@ export function ProductForm({
       description: "",
       purchasePrice: 0,
       sellPrice: 0,
+      oldPrice: undefined,
       minStock: 0,
       maxStock: 0,
       stockMethod: "FEFO",
@@ -250,6 +251,30 @@ export function ProductForm({
                       step="0.01"
                       value={field.value}
                       onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                      onBlur={field.onBlur}
+                      name={field.name}
+                      ref={field.ref}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="oldPrice"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Eski narx (chegirma uchun, ixtiyoriy)</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      value={field.value ?? ""}
+                      onChange={(e) =>
+                        field.onChange(e.target.value === "" ? undefined : e.target.valueAsNumber)
+                      }
                       onBlur={field.onBlur}
                       name={field.name}
                       ref={field.ref}

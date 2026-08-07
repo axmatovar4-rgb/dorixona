@@ -76,6 +76,7 @@ export default async function ShopProductPage({
     unit: p.unit,
     dosage: p.dosage,
     sellPrice: String(p.sellPrice),
+    oldPrice: p.oldPrice != null ? String(p.oldPrice) : null,
     prescriptionRequired: p.prescriptionRequired,
     imageUrl: p.imageUrl,
     category: p.category?.name ?? null,
@@ -141,10 +142,23 @@ export default async function ShopProductPage({
             </div>
           </div>
 
-          <p className="text-4xl font-bold tracking-tight">
-            {Number(product.sellPrice).toLocaleString("uz-UZ")}
-            <span className="text-base font-medium text-muted-foreground"> so&apos;m / {product.unit}</span>
-          </p>
+          <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+            <p
+              className={
+                product.oldPrice != null && Number(product.oldPrice) > Number(product.sellPrice)
+                  ? "text-4xl font-bold tracking-tight text-red-600 dark:text-red-400"
+                  : "text-4xl font-bold tracking-tight"
+              }
+            >
+              {Number(product.sellPrice).toLocaleString("uz-UZ")}
+              <span className="text-base font-medium text-muted-foreground"> so&apos;m / {product.unit}</span>
+            </p>
+            {product.oldPrice != null && Number(product.oldPrice) > Number(product.sellPrice) && (
+              <span className="text-lg text-muted-foreground line-through">
+                {Number(product.oldPrice).toLocaleString("uz-UZ")} so&apos;m
+              </span>
+            )}
+          </div>
 
           <div className="hidden sm:block">
             <AddToCart

@@ -45,6 +45,7 @@ export async function getFrequentlyBoughtWith(
       unit: p.unit,
       dosage: p.dosage,
       sellPrice: String(p.sellPrice),
+      oldPrice: p.oldPrice != null ? String(p.oldPrice) : null,
       prescriptionRequired: p.prescriptionRequired,
       imageUrl: p.imageUrl,
       category: p.category?.name ?? null,

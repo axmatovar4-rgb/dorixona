@@ -105,6 +105,7 @@ function toPrismaData(data: ProductInput) {
     description: data.description || null,
     purchasePrice: data.purchasePrice,
     sellPrice: data.sellPrice,
+    oldPrice: data.oldPrice || null,
     minStock: data.minStock,
     maxStock: data.maxStock,
     stockMethod: data.stockMethod,

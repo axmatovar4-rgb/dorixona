@@ -24,6 +24,7 @@ export const productSchema = z.object({
   description: z.string().trim().optional().or(z.literal("")),
   purchasePrice: z.number().min(0, "Manfiy bo'lishi mumkin emas"),
   sellPrice: z.number().min(0, "Manfiy bo'lishi mumkin emas"),
+  oldPrice: z.number().min(0, "Manfiy bo'lishi mumkin emas").optional().nullable(),
   minStock: z.number().int().min(0),
   maxStock: z.number().int().min(0),
   stockMethod: z.enum(["FEFO", "FIFO"]),

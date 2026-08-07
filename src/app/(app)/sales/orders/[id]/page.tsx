@@ -78,6 +78,12 @@ export default async function StaffOrderDetailPage({
             <span className="text-muted-foreground">To&apos;lov usuli</span>
             <p className="font-medium">{PAYMENT_METHOD_LABELS[order.paymentMethod]}</p>
           </div>
+          {order.courierNote && (
+            <div className="sm:col-span-2">
+              <span className="text-muted-foreground">Kuryerga izoh</span>
+              <p className="font-medium">{order.courierNote}</p>
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -112,6 +118,12 @@ export default async function StaffOrderDetailPage({
               <span className="text-muted-foreground">Mahsulotlar</span>
               <span>{Number(order.subtotal).toLocaleString("uz-UZ")} so&apos;m</span>
             </div>
+            {Number(order.discountAmount) > 0 && (
+              <div className="flex justify-between text-emerald-600 dark:text-emerald-400">
+                <span>Chegirma {order.discountCode ? `(${order.discountCode})` : ""}</span>
+                <span>-{Number(order.discountAmount).toLocaleString("uz-UZ")} so&apos;m</span>
+              </div>
+            )}
             <div className="flex justify-between">
               <span className="text-muted-foreground">Yetkazib berish</span>
               <span>{Number(order.deliveryFee).toLocaleString("uz-UZ")} so&apos;m</span>

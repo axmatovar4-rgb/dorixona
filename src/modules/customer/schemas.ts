@@ -37,6 +37,8 @@ export const PAYMENT_METHODS = ["CASH_ON_DELIVERY", "CLICK", "PAYME", "UZCARD", 
 export const checkoutSchema = z.object({
   addressId: z.string().min(1, "Manzilni tanlang"),
   paymentMethod: z.enum(PAYMENT_METHODS),
+  courierNote: z.string().trim().max(300, "Ko'pi bilan 300 ta belgi").optional().or(z.literal("")),
+  promoCode: z.string().trim().max(20).optional().or(z.literal("")),
   items: z
     .array(
       z.object({

@@ -13,17 +13,22 @@ import {
   ArrowRight,
   ShoppingBag,
   LocateFixed,
+  MessageSquareText,
+  Tag,
+  X,
 } from "lucide-react";
 import { useCart } from "@/modules/customer/cart-context";
 import { DELIVERY_FEE } from "@/modules/customer/constants";
 import { createOrder, createAddress } from "@/modules/customer/actions";
 import { detectCurrentAddress } from "@/modules/customer/geolocation";
 import { PAYMENT_METHODS } from "@/modules/customer/schemas";
+import { checkPromoCode } from "@/modules/promo/actions";
 import { PaymeLogo, ClickLogo, HumoLogo, UzcardLogo, VisaLogo, CashCoinIcon } from "@/components/payment-logos";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Textarea } from "@/components/ui/textarea";
 import { PageContainer } from "@/modules/customer/components/section";
 import { FakePaymentCard } from "@/modules/customer/components/fake-payment-card";
 import { cn } from "@/lib/utils";
@@ -84,10 +89,28 @@ export function CheckoutForm({ addresses }: { addresses: Address[] }) {
     React.useState<(typeof PAYMENT_METHODS)[number]>("CASH_ON_DELIVERY");
   const [onlinePaymentValid, setOnlinePaymentValid] = React.useState(false);
   const [submitting, setSubmitting] = React.useState(false);
+  const [courierNote, setCourierNote] = React.useState("");
+  const [promoInput, setPromoInput] = React.useState("");
+  const [appliedPromo, setAppliedPromo] = React.useState<{ code: string; discountPercent: number } | null>(null);
+  const [applyingPromo, setApplyingPromo] = React.useState(false);
 
-  const total = subtotal + DELIVERY_FEE;
+  const discountAmount = appliedPromo ? Math.round((subtotal * appliedPromo.discountPercent) / 100) : 0;
+  const total = subtotal - discountAmount + DELIVERY_FEE;
   const isOnlinePayment = paymentMethod !== "CASH_ON_DELIVERY";
   const canSubmit = !isOnlinePayment || onlinePaymentValid;
+
+  async function handleApplyPromo() {
+    if (!promoInput.trim()) return;
+    setApplyingPromo(true);
+    const result = await checkPromoCode(promoInput);
+    setApplyingPromo(false);
+    if (!result.valid) {
+      toast.error(result.error);
+      return;
+    }
+    setAppliedPromo({ code: result.code, discountPercent: result.discountPercent });
+    toast.success(`Aksiya kodi qo'llandi: -${result.discountPercent}%`);
+  }
 
   async function handleAddAddress() {
     if (newAddress.trim().length < 5) {
@@ -124,6 +147,8 @@ export function CheckoutForm({ addresses }: { addresses: Address[] }) {
     const result = await createOrder({
       addressId,
       paymentMethod,
+      courierNote: courierNote.trim(),
+      promoCode: appliedPromo?.code ?? "",
       items: items.map((i) => ({ productId: i.productId, quantity: i.quantity })),
     });
     setSubmitting(false);
@@ -227,6 +252,21 @@ export function CheckoutForm({ addresses }: { addresses: Address[] }) {
               </Button>
             )}
           </div>
+
+          <div className="mt-4 flex flex-col gap-1.5">
+            <label className="flex items-center gap-1.5 text-sm font-medium">
+              <MessageSquareText className="h-4 w-4 text-primary" />
+              Kuryerga izoh (ixtiyoriy)
+            </label>
+            <Textarea
+              placeholder="Masalan: eshik oldiga qo'ying, domofon ishlamaydi va h.k."
+              value={courierNote}
+              onChange={(e) => setCourierNote(e.target.value)}
+              maxLength={300}
+              className="rounded-xl"
+              rows={2}
+            />
+          </div>
         </div>
 
         <div className="rounded-2xl border bg-card p-6 portal-shadow-sm">
@@ -272,6 +312,49 @@ export function CheckoutForm({ addresses }: { addresses: Address[] }) {
 
       <div className="h-fit rounded-2xl border bg-card p-6 portal-shadow-sm lg:sticky lg:top-24">
         <h2 className="mb-4 font-semibold">Buyurtma tafsilotlari</h2>
+
+        <div className="mb-4 flex flex-col gap-1.5">
+          <label className="flex items-center gap-1.5 text-sm font-medium">
+            <Tag className="h-4 w-4 text-primary" />
+            Aksiya kodi
+          </label>
+          {appliedPromo ? (
+            <div className="flex items-center justify-between rounded-xl border border-primary/30 bg-primary/5 px-3 py-2 text-sm">
+              <span className="font-mono font-semibold text-primary">
+                {appliedPromo.code} · -{appliedPromo.discountPercent}%
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  setAppliedPromo(null);
+                  setPromoInput("");
+                }}
+                className="text-muted-foreground hover:text-destructive"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          ) : (
+            <div className="flex gap-2">
+              <Input
+                placeholder="Masalan: YANGI10"
+                value={promoInput}
+                onChange={(e) => setPromoInput(e.target.value.toUpperCase())}
+                className="rounded-xl font-mono uppercase"
+              />
+              <Button
+                type="button"
+                variant="outline"
+                className="shrink-0 rounded-xl"
+                disabled={applyingPromo || !promoInput.trim()}
+                onClick={handleApplyPromo}
+              >
+                {applyingPromo ? <Loader2 className="h-4 w-4 animate-spin" /> : "Qo'llash"}
+              </Button>
+            </div>
+          )}
+        </div>
+
         <div className="flex flex-col gap-2">
           {items.map((item) => (
             <div key={item.productId} className="flex justify-between text-sm">
@@ -286,6 +369,12 @@ export function CheckoutForm({ addresses }: { addresses: Address[] }) {
             <span className="text-muted-foreground">Mahsulotlar</span>
             <span>{subtotal.toLocaleString("uz-UZ")} so&apos;m</span>
           </div>
+          {discountAmount > 0 && (
+            <div className="flex justify-between text-sm text-emerald-600 dark:text-emerald-400">
+              <span>Aksiya chegirmasi</span>
+              <span>-{discountAmount.toLocaleString("uz-UZ")} so&apos;m</span>
+            </div>
+          )}
           <div className="flex justify-between text-sm">
             <span className="text-muted-foreground">Yetkazib berish</span>
             <span>{DELIVERY_FEE.toLocaleString("uz-UZ")} so&apos;m</span>

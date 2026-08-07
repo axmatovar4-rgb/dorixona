@@ -50,6 +50,7 @@ export default async function EditProductPage({
           description: product.description ?? "",
           purchasePrice: Number(product.purchasePrice),
           sellPrice: Number(product.sellPrice),
+          oldPrice: product.oldPrice != null ? Number(product.oldPrice) : undefined,
           minStock: product.minStock,
           maxStock: product.maxStock,
           stockMethod: product.stockMethod,

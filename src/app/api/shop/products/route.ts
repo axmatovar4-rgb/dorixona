@@ -42,6 +42,7 @@ export async function GET(request: NextRequest) {
       unit: p.unit,
       dosage: p.dosage,
       sellPrice: p.sellPrice,
+      oldPrice: p.oldPrice,
       prescriptionRequired: p.prescriptionRequired,
       imageUrl: p.imageUrl,
       description: p.description,

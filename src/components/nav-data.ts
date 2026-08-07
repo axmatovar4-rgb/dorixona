@@ -12,6 +12,7 @@ import {
   Bell,
   Settings,
   History,
+  Percent,
   type LucideIcon,
 } from "lucide-react";
 
@@ -49,6 +50,7 @@ export const NAV_ITEMS: NavItem[] = [
     ],
   },
   { title: "Xaridlar", href: "/procurement", icon: Truck },
+  { title: "Aksiya kodlari", href: "/promo-codes", icon: Percent },
   {
     title: "Sotuvlar",
     icon: ScanBarcode,

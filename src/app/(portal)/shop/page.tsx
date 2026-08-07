@@ -16,6 +16,7 @@ async function toCardData(
     unit: string;
     dosage: string | null;
     sellPrice: unknown;
+    oldPrice: unknown;
     prescriptionRequired: boolean;
     imageUrl: string | null;
     category?: { name: string } | null;
@@ -35,6 +36,7 @@ async function toCardData(
     unit: p.unit,
     dosage: p.dosage,
     sellPrice: String(p.sellPrice),
+    oldPrice: p.oldPrice != null ? String(p.oldPrice) : null,
     prescriptionRequired: p.prescriptionRequired,
     imageUrl: p.imageUrl,
     category: p.category?.name ?? null,

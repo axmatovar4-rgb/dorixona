@@ -163,7 +163,7 @@ export async function createOrder(input: CheckoutInput) {
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "Ma'lumotlar noto'g'ri" };
   }
-  const { addressId, paymentMethod, items } = parsed.data;
+  const { addressId, paymentMethod, courierNote, promoCode, items } = parsed.data;
 
   const address = await prisma.address.findUnique({ where: { id: addressId } });
   if (!address || address.customerId !== session.user.id) {
@@ -192,7 +192,17 @@ export async function createOrder(input: CheckoutInput) {
       lineTotal,
     };
   });
-  const total = subtotal + DELIVERY_FEE;
+  let discountAmount = 0;
+  let appliedCode: string | null = null;
+  if (promoCode) {
+    const found = await prisma.promoCode.findUnique({ where: { code: promoCode.trim().toUpperCase() } });
+    if (!found || !found.isActive) {
+      return { error: "Aksiya kodi noto'g'ri yoki faol emas" };
+    }
+    discountAmount = Math.round((subtotal * found.discountPercent) / 100);
+    appliedCode = found.code;
+  }
+  const total = subtotal - discountAmount + DELIVERY_FEE;
 
   let orderId: string;
   try {
@@ -206,6 +216,9 @@ export async function createOrder(input: CheckoutInput) {
           deliveryFee: DELIVERY_FEE,
           total,
           requiresPrescription,
+          courierNote: courierNote || null,
+          discountCode: appliedCode,
+          discountAmount,
           items: { create: orderItems },
         },
         include: { items: true },

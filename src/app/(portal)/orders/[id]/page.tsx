@@ -105,6 +105,12 @@ export default async function OrderDetailPage({
             <span className="text-muted-foreground">Mahsulotlar</span>
             <span>{Number(order.subtotal).toLocaleString("uz-UZ")} so&apos;m</span>
           </div>
+          {Number(order.discountAmount) > 0 && (
+            <div className="flex justify-between text-emerald-600 dark:text-emerald-400">
+              <span>Aksiya chegirmasi {order.discountCode ? `(${order.discountCode})` : ""}</span>
+              <span>-{Number(order.discountAmount).toLocaleString("uz-UZ")} so&apos;m</span>
+            </div>
+          )}
           <div className="flex justify-between">
             <span className="text-muted-foreground">Yetkazib berish</span>
             <span>{Number(order.deliveryFee).toLocaleString("uz-UZ")} so&apos;m</span>
@@ -124,6 +130,11 @@ export default async function OrderDetailPage({
             Manzil
           </h2>
           <p className="font-medium">{order.address.fullAddress}</p>
+          {order.courierNote && (
+            <p className="mt-2 rounded-lg bg-muted px-2.5 py-1.5 text-xs text-muted-foreground">
+              Kuryerga izoh: {order.courierNote}
+            </p>
+          )}
         </div>
         <div className="rounded-2xl border bg-card p-5 portal-shadow-sm">
           <h2 className="mb-2 flex items-center gap-2 text-sm font-semibold text-muted-foreground">
