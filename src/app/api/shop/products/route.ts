@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { getActivePromoMap } from "@/modules/customer/promo-map";
 
 export async function GET(request: NextRequest) {
   const params = request.nextUrl.searchParams;
@@ -34,6 +35,7 @@ export async function GET(request: NextRequest) {
     _sum: { quantity: true },
   });
   const stockMap = new Map(stockByProduct.map((s) => [s.productId, s._sum.quantity ?? 0]));
+  const promoMap = await getActivePromoMap(products.map((p) => p.id));
 
   return NextResponse.json({
     data: products.map((p) => ({
@@ -43,6 +45,7 @@ export async function GET(request: NextRequest) {
       dosage: p.dosage,
       sellPrice: p.sellPrice,
       oldPrice: p.oldPrice,
+      promo: promoMap.get(p.id) ?? null,
       prescriptionRequired: p.prescriptionRequired,
       imageUrl: p.imageUrl,
       description: p.description,

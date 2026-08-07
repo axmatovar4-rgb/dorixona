@@ -10,6 +10,7 @@ import {
   Info,
   Factory,
   FlaskConical,
+  Tag,
 } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { Badge } from "@/components/ui/badge";
@@ -20,6 +21,7 @@ import { MedicineCard, type MedicineCardData } from "@/modules/customer/componen
 import { AddToCart } from "@/modules/customer/components/add-to-cart";
 import { StockAlertButton } from "@/modules/customer/components/stock-alert-button";
 import { getFrequentlyBoughtWith } from "@/modules/customer/recommendations";
+import { getActivePromoMap } from "@/modules/customer/promo-map";
 import { StickyAddToCart } from "./sticky-add-to-cart";
 
 export async function generateMetadata({
@@ -70,6 +72,8 @@ export default async function ShopProductPage({
     _sum: { quantity: true },
   });
   const similarStockMap = new Map(similarStock.map((s) => [s.productId, s._sum.quantity ?? 0]));
+  const promoMap = await getActivePromoMap([id, ...similarRaw.map((p) => p.id)]);
+  const productPromo = promoMap.get(id) ?? null;
   const similar: MedicineCardData[] = similarRaw.map((p) => ({
     id: p.id,
     name: p.name,
@@ -77,6 +81,7 @@ export default async function ShopProductPage({
     dosage: p.dosage,
     sellPrice: String(p.sellPrice),
     oldPrice: p.oldPrice != null ? String(p.oldPrice) : null,
+    promo: promoMap.get(p.id) ?? null,
     prescriptionRequired: p.prescriptionRequired,
     imageUrl: p.imageUrl,
     category: p.category?.name ?? null,
@@ -159,6 +164,12 @@ export default async function ShopProductPage({
               </span>
             )}
           </div>
+          {productPromo && (
+            <Badge className="w-fit gap-1 border-0 bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-400">
+              <Tag className="h-3 w-3" />
+              {productPromo.code} kodi bilan -{productPromo.discountPercent}%
+            </Badge>
+          )}
 
           <div className="hidden sm:block">
             <AddToCart

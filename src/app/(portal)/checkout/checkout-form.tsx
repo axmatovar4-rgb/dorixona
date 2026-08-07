@@ -91,10 +91,21 @@ export function CheckoutForm({ addresses }: { addresses: Address[] }) {
   const [submitting, setSubmitting] = React.useState(false);
   const [courierNote, setCourierNote] = React.useState("");
   const [promoInput, setPromoInput] = React.useState("");
-  const [appliedPromo, setAppliedPromo] = React.useState<{ code: string; discountPercent: number } | null>(null);
+  const [appliedPromo, setAppliedPromo] = React.useState<{
+    code: string;
+    discountPercent: number;
+    productIds: string[];
+  } | null>(null);
   const [applyingPromo, setApplyingPromo] = React.useState(false);
 
-  const discountAmount = appliedPromo ? Math.round((subtotal * appliedPromo.discountPercent) / 100) : 0;
+  const promoEligibleSubtotal = appliedPromo
+    ? appliedPromo.productIds.length > 0
+      ? items
+          .filter((i) => appliedPromo.productIds.includes(i.productId))
+          .reduce((sum, i) => sum + i.sellPrice * i.quantity, 0)
+      : subtotal
+    : 0;
+  const discountAmount = appliedPromo ? Math.round((promoEligibleSubtotal * appliedPromo.discountPercent) / 100) : 0;
   const total = subtotal - discountAmount + DELIVERY_FEE;
   const isOnlinePayment = paymentMethod !== "CASH_ON_DELIVERY";
   const canSubmit = !isOnlinePayment || onlinePaymentValid;
@@ -108,7 +119,11 @@ export function CheckoutForm({ addresses }: { addresses: Address[] }) {
       toast.error(result.error);
       return;
     }
-    setAppliedPromo({ code: result.code, discountPercent: result.discountPercent });
+    if (result.productIds.length > 0 && !items.some((i) => result.productIds.includes(i.productId))) {
+      toast.error("Bu kod savatingizdagi mahsulotlarga tegishli emas");
+      return;
+    }
+    setAppliedPromo({ code: result.code, discountPercent: result.discountPercent, productIds: result.productIds });
     toast.success(`Aksiya kodi qo'llandi: -${result.discountPercent}%`);
   }
 

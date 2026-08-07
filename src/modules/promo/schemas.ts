@@ -8,5 +8,6 @@ export const promoCodeSchema = z.object({
     .max(20, "Ko'pi bilan 20 ta belgi")
     .regex(/^[A-Za-z0-9]+$/, "Faqat lotin harflari va raqamlar"),
   discountPercent: z.coerce.number().int().min(1, "Kamida 1%").max(90, "Ko'pi bilan 90%"),
+  productIds: z.array(z.string()).optional(),
 });
 export type PromoCodeInput = z.infer<typeof promoCodeSchema>;

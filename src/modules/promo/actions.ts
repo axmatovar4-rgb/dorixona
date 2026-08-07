@@ -20,7 +20,13 @@ export async function createPromoCode(input: PromoCodeInput) {
   if (existing) return { error: "Bu kod allaqachon mavjud" };
 
   const promoCode = await prisma.promoCode.create({
-    data: { code, discountPercent: parsed.data.discountPercent },
+    data: {
+      code,
+      discountPercent: parsed.data.discountPercent,
+      products: parsed.data.productIds?.length
+        ? { connect: parsed.data.productIds.map((id) => ({ id })) }
+        : undefined,
+    },
   });
 
   await logAudit({ userId: session.user.id, action: "CREATE", entityType: "PromoCode", entityId: promoCode.id });
@@ -57,9 +63,17 @@ export async function checkPromoCode(rawCode: string) {
   const code = rawCode.trim().toUpperCase();
   if (!code) return { valid: false as const, error: "Kodni kiriting" };
 
-  const promoCode = await prisma.promoCode.findUnique({ where: { code } });
+  const promoCode = await prisma.promoCode.findUnique({
+    where: { code },
+    include: { products: { select: { id: true } } },
+  });
   if (!promoCode || !promoCode.isActive) {
     return { valid: false as const, error: "Bunday kod topilmadi yoki faol emas" };
   }
-  return { valid: true as const, code, discountPercent: promoCode.discountPercent };
+  return {
+    valid: true as const,
+    code,
+    discountPercent: promoCode.discountPercent,
+    productIds: promoCode.products.map((p) => p.id),
+  };
 }

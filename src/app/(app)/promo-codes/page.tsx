@@ -10,7 +10,17 @@ export const metadata: Metadata = { title: "Aksiya kodlari" };
 export default async function PromoCodesPage() {
   const session = await auth();
   const canManage = await canAsync(session?.user.role, "promoCodes", "create");
-  const promoCodes = await prisma.promoCode.findMany({ orderBy: { createdAt: "desc" } });
+  const [promoCodes, products] = await Promise.all([
+    prisma.promoCode.findMany({
+      orderBy: { createdAt: "desc" },
+      include: { products: { select: { id: true, name: true } } },
+    }),
+    prisma.product.findMany({
+      where: { isActive: true },
+      select: { id: true, name: true },
+      orderBy: { name: "asc" },
+    }),
+  ]);
 
   return (
     <div className="flex flex-col gap-4">
@@ -23,7 +33,7 @@ export default async function PromoCodesPage() {
           <CardTitle>Kodlar ro&apos;yxati</CardTitle>
         </CardHeader>
         <CardContent>
-          <PromoCodeManager promoCodes={promoCodes} canManage={canManage} />
+          <PromoCodeManager promoCodes={promoCodes} products={products} canManage={canManage} />
         </CardContent>
       </Card>
     </div>

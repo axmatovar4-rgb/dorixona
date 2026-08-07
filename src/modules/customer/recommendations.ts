@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import type { MedicineCardData } from "@/modules/customer/components/medicine-card";
+import { getActivePromoMap } from "@/modules/customer/promo-map";
 
 export async function getFrequentlyBoughtWith(
   productId: string,
@@ -34,6 +35,7 @@ export async function getFrequentlyBoughtWith(
     _sum: { quantity: true },
   });
   const stockMap = new Map(stock.map((s) => [s.productId, s._sum.quantity ?? 0]));
+  const promoMap = await getActivePromoMap(companionIds);
 
   const productMap = new Map(products.map((p) => [p.id, p]));
   return companionIds
@@ -46,6 +48,7 @@ export async function getFrequentlyBoughtWith(
       dosage: p.dosage,
       sellPrice: String(p.sellPrice),
       oldPrice: p.oldPrice != null ? String(p.oldPrice) : null,
+      promo: promoMap.get(p.id) ?? null,
       prescriptionRequired: p.prescriptionRequired,
       imageUrl: p.imageUrl,
       category: p.category?.name ?? null,

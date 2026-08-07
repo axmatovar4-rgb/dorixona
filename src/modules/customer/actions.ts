@@ -195,11 +195,19 @@ export async function createOrder(input: CheckoutInput) {
   let discountAmount = 0;
   let appliedCode: string | null = null;
   if (promoCode) {
-    const found = await prisma.promoCode.findUnique({ where: { code: promoCode.trim().toUpperCase() } });
+    const found = await prisma.promoCode.findUnique({
+      where: { code: promoCode.trim().toUpperCase() },
+      include: { products: { select: { id: true } } },
+    });
     if (!found || !found.isActive) {
       return { error: "Aksiya kodi noto'g'ri yoki faol emas" };
     }
-    discountAmount = Math.round((subtotal * found.discountPercent) / 100);
+    const scopedProductIds = found.products.map((p) => p.id);
+    const eligibleSubtotal =
+      scopedProductIds.length > 0
+        ? orderItems.filter((i) => scopedProductIds.includes(i.productId)).reduce((sum, i) => sum + i.lineTotal, 0)
+        : subtotal;
+    discountAmount = Math.round((eligibleSubtotal * found.discountPercent) / 100);
     appliedCode = found.code;
   }
   const total = subtotal - discountAmount + DELIVERY_FEE;

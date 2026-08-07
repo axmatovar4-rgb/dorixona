@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { toast } from "sonner";
-import { Pill, ShoppingBag, Eye } from "lucide-react";
+import { Pill, ShoppingBag, Eye, Tag } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/modules/customer/cart-context";
@@ -17,6 +17,7 @@ export type MedicineCardData = {
   dosage?: string | null;
   sellPrice: string | number;
   oldPrice?: string | number | null;
+  promo?: { code: string; discountPercent: number } | null;
   prescriptionRequired: boolean;
   imageUrl?: string | null;
   category?: string | null;
@@ -100,6 +101,12 @@ export function MedicineCard({
             </span>
           )}
         </div>
+        {product.promo && (
+          <p className="flex items-center gap-1 text-xs font-medium text-amber-700 dark:text-amber-500">
+            <Tag className="h-3 w-3" />
+            {product.promo.code} bilan -{product.promo.discountPercent}%
+          </p>
+        )}
 
         <div className="mt-3 flex gap-2">
           <Button

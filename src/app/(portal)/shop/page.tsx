@@ -8,6 +8,7 @@ import { AIBanner } from "@/modules/customer/components/ai-banner";
 import { HealthTips } from "./health-tips";
 import { ShopGrid } from "./shop-grid";
 import { PartnersSection, CertificatesSection, BranchesSection, ContactSection } from "./trust-sections";
+import { getActivePromoMap } from "@/modules/customer/promo-map";
 
 async function toCardData(
   products: {
@@ -29,6 +30,7 @@ async function toCardData(
     _sum: { quantity: true },
   });
   const stockMap = new Map(stockByProduct.map((s) => [s.productId, s._sum.quantity ?? 0]));
+  const promoMap = await getActivePromoMap(products.map((p) => p.id));
 
   return products.map((p) => ({
     id: p.id,
@@ -37,6 +39,7 @@ async function toCardData(
     dosage: p.dosage,
     sellPrice: String(p.sellPrice),
     oldPrice: p.oldPrice != null ? String(p.oldPrice) : null,
+    promo: promoMap.get(p.id) ?? null,
     prescriptionRequired: p.prescriptionRequired,
     imageUrl: p.imageUrl,
     category: p.category?.name ?? null,

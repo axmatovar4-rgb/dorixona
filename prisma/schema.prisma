@@ -192,11 +192,12 @@ model Order {
 }
 
 model PromoCode {
-  id              String   @id @default(cuid())
-  code            String   @unique
+  id              String    @id @default(cuid())
+  code            String    @unique
   discountPercent Int
-  isActive        Boolean  @default(true)
-  createdAt       DateTime @default(now())
+  isActive        Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+  products        Product[]
 }
 
 model OrderItem {
@@ -363,6 +364,7 @@ model Product {
   notifications Notification[]
   stockAlerts   StockAlertSubscription[]
   purchaseOrderItems PurchaseOrderItem[]
+  promoCodes    PromoCode[]
 
   @@index([name])
 }
