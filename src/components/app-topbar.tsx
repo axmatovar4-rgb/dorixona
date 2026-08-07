@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Menu, LogOut, User } from "lucide-react";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
@@ -75,13 +76,15 @@ export function AppTopbar({
             <DropdownMenuGroup>
               <DropdownMenuLabel className="flex flex-col">
                 <span>{userName}</span>
-                <span className="text-xs font-normal text-muted-foreground">
-                  {roleLabel}
-                </span>
+                {roleLabel !== userName && (
+                  <span className="text-xs font-normal text-muted-foreground">
+                    {roleLabel}
+                  </span>
+                )}
               </DropdownMenuLabel>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem disabled>
+            <DropdownMenuItem render={<Link href="/profile" />}>
               <User className="h-4 w-4" />
               Profil
             </DropdownMenuItem>
