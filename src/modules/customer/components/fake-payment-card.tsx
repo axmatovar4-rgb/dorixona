@@ -85,7 +85,7 @@ export function FakePaymentCard({
                 cardType === "VISA" ? "bg-background shadow-sm text-primary" : "text-muted-foreground"
               )}
             >
-              Visa / Mastercard
+              Visa
             </button>
           </div>
         )}
