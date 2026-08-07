@@ -1,11 +1,11 @@
-import type Anthropic from "@anthropic-ai/sdk";
+import type { FunctionDeclaration } from "@google/genai";
 import { prisma } from "@/lib/prisma";
 
-export const searchMedicinesTool: Anthropic.Tool = {
+export const searchMedicinesTool: FunctionDeclaration = {
   name: "search_medicines",
   description:
     "PharmCare dorixonasi katalogidan dori nomi bo'yicha qidiradi. Foydalanuvchi biror dori haqida (mavjudligi, narxi, qadoqlanishi) so'raganda ishlating. Har bir natija uchun nomi, dozasi, birligi, narxi, retsept talab qilinishi va omborda mavjudligini qaytaradi.",
-  input_schema: {
+  parametersJsonSchema: {
     type: "object",
     properties: {
       query: {

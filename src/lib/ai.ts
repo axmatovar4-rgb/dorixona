@@ -1,16 +1,16 @@
-import Anthropic from "@anthropic-ai/sdk";
+import { GoogleGenAI } from "@google/genai";
 
-const globalForAnthropic = globalThis as unknown as {
-  anthropic: Anthropic | undefined;
+const globalForGemini = globalThis as unknown as {
+  gemini: GoogleGenAI | undefined;
 };
 
-export const anthropic =
-  globalForAnthropic.anthropic ??
-  new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+export const gemini =
+  globalForGemini.gemini ??
+  new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
-if (process.env.NODE_ENV !== "production") globalForAnthropic.anthropic = anthropic;
+if (process.env.NODE_ENV !== "production") globalForGemini.gemini = gemini;
 
-export const AI_MODEL = "claude-opus-5";
+export const AI_MODEL = "gemini-flash-latest";
 
 export const AI_SYSTEM_PROMPT = `Siz "PharmCare" onlayn dorixonasining AI Sog'liq Yordamchisisiz. Siz dorixona mijozlari bilan sog'liq va dorilar haqida suhbatlashasiz.
 

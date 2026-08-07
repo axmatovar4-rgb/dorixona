@@ -1,12 +1,25 @@
 import { NextRequest } from "next/server";
-import Anthropic from "@anthropic-ai/sdk";
+import {
+  createModelContent,
+  createPartFromFunctionCall,
+  createPartFromFunctionResponse,
+  createPartFromText,
+  type Content,
+  type Part,
+} from "@google/genai";
 import { auth } from "@/lib/auth";
-import { anthropic, AI_MODEL, AI_SYSTEM_PROMPT } from "@/lib/ai";
+import { gemini, AI_MODEL, AI_SYSTEM_PROMPT } from "@/lib/ai";
 import { searchMedicinesTool, runSearchMedicines } from "@/modules/ai/tools";
 
 export const runtime = "nodejs";
 
 type ChatMessage = { role: "user" | "assistant"; text: string };
+type PendingCall = {
+  id: string;
+  name: string;
+  args: Record<string, unknown>;
+  thoughtSignature?: string;
+};
 
 const MAX_TURNS = 20;
 const MAX_TOOL_ROUNDS = 3;
@@ -23,14 +36,14 @@ export async function POST(req: NextRequest) {
     return new Response("Bad request", { status: 400 });
   }
 
-  const messages: Anthropic.MessageParam[] = incoming.map((m) => ({
-    role: m.role,
-    content: m.text,
+  const contents: Content[] = incoming.map((m) => ({
+    role: m.role === "assistant" ? "model" : "user",
+    parts: [{ text: m.text }],
   }));
 
   const encoder = new TextEncoder();
 
-  if (!process.env.ANTHROPIC_API_KEY) {
+  if (!process.env.GEMINI_API_KEY) {
     return new Response("AI Sog'liq Yordamchisi tez orada ishga tushadi ✨", {
       headers: { "Content-Type": "text/plain; charset=utf-8" },
     });
@@ -42,41 +55,58 @@ export async function POST(req: NextRequest) {
         let toolRounds = 0;
 
         while (true) {
-          const apiStream = anthropic.messages.stream({
+          const apiStream = await gemini.models.generateContentStream({
             model: AI_MODEL,
-            max_tokens: 2048,
-            system: AI_SYSTEM_PROMPT,
-            tools: [searchMedicinesTool],
-            messages,
+            contents,
+            config: {
+              systemInstruction: AI_SYSTEM_PROMPT,
+              tools: [{ functionDeclarations: [searchMedicinesTool] }],
+            },
           });
 
-          for await (const event of apiStream) {
-            if (
-              event.type === "content_block_delta" &&
-              event.delta.type === "text_delta"
-            ) {
-              controller.enqueue(encoder.encode(event.delta.text));
+          let fullText = "";
+          const pendingCalls: PendingCall[] = [];
+
+          for await (const chunk of apiStream) {
+            const text = chunk.text;
+            if (text) {
+              fullText += text;
+              controller.enqueue(encoder.encode(text));
+            }
+            for (const part of chunk.candidates?.[0]?.content?.parts ?? []) {
+              if (part.functionCall?.name) {
+                pendingCalls.push({
+                  id: part.functionCall.id ?? `${part.functionCall.name}-${pendingCalls.length}`,
+                  name: part.functionCall.name,
+                  args: part.functionCall.args ?? {},
+                  thoughtSignature: part.thoughtSignature,
+                });
+              }
             }
           }
 
-          const finalMessage = await apiStream.finalMessage();
-          messages.push({ role: "assistant", content: finalMessage.content });
+          const modelParts: Part[] = [];
+          if (fullText) modelParts.push(createPartFromText(fullText));
+          for (const call of pendingCalls) {
+            const callPart = createPartFromFunctionCall(call.name, call.args);
+            if (call.thoughtSignature) callPart.thoughtSignature = call.thoughtSignature;
+            modelParts.push(callPart);
+          }
+          if (modelParts.length > 0) {
+            contents.push(createModelContent(modelParts));
+          }
 
-          if (finalMessage.stop_reason !== "tool_use" || toolRounds >= MAX_TOOL_ROUNDS) {
+          if (pendingCalls.length === 0 || toolRounds >= MAX_TOOL_ROUNDS) {
             break;
           }
           toolRounds++;
 
-          const toolUseBlocks = finalMessage.content.filter(
-            (b): b is Anthropic.ToolUseBlock => b.type === "tool_use"
-          );
-
-          const toolResults: Anthropic.ToolResultBlockParam[] = [];
-          for (const block of toolUseBlocks) {
+          const responseParts: Part[] = [];
+          for (const call of pendingCalls) {
             let resultText: string;
             try {
-              if (block.name === "search_medicines") {
-                const input = block.input as { query: string };
+              if (call.name === "search_medicines") {
+                const input = call.args as { query: string };
                 resultText = await runSearchMedicines(input.query);
               } else {
                 resultText = JSON.stringify({ error: "Noma'lum vosita" });
@@ -84,23 +114,18 @@ export async function POST(req: NextRequest) {
             } catch {
               resultText = JSON.stringify({ error: "Vositani bajarishda xatolik yuz berdi" });
             }
-            toolResults.push({
-              type: "tool_result",
-              tool_use_id: block.id,
-              content: resultText,
-            });
+            responseParts.push(
+              createPartFromFunctionResponse(call.id, call.name, JSON.parse(resultText))
+            );
           }
 
-          messages.push({ role: "user", content: toolResults });
+          contents.push({ role: "user", parts: responseParts });
         }
       } catch (err) {
         console.error("AI chat error:", err);
-        const message =
-          err instanceof Anthropic.APIError &&
-          (err.status === 401 || err.status === 403 || err.type === "billing_error")
-            ? "AI Sog'liq Yordamchisi hozircha sozlanmagan. Iltimos, keyinroq qayta urinib ko'ring."
-            : "Uzr, javob berishda xatolik yuz berdi. Birozdan so'ng qayta urinib ko'ring.";
-        controller.enqueue(encoder.encode(`\n\n${message}`));
+        controller.enqueue(
+          encoder.encode("\n\nUzr, javob berishda xatolik yuz berdi. Birozdan so'ng qayta urinib ko'ring.")
+        );
       } finally {
         controller.close();
       }
