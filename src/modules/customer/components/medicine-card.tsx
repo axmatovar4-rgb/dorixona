@@ -102,10 +102,10 @@ export function MedicineCard({
           )}
         </div>
         {product.promo && (
-          <p className="flex items-center gap-1 text-xs font-medium text-amber-700 dark:text-amber-500">
-            <Tag className="h-3 w-3" />
+          <span className="flex w-fit items-center gap-1 rounded-full bg-amber-100 px-2 py-1 text-xs font-semibold text-amber-900 dark:bg-amber-500/20 dark:text-amber-300">
+            <Tag className="h-3.5 w-3.5" />
             {product.promo.code} bilan -{product.promo.discountPercent}%
-          </p>
+          </span>
         )}
 
         <div className="mt-3 flex gap-2">
