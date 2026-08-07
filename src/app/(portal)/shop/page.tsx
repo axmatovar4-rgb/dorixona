@@ -7,6 +7,7 @@ import { PageContainer, SectionHeader } from "@/modules/customer/components/sect
 import { AIBanner } from "@/modules/customer/components/ai-banner";
 import { HealthTips } from "./health-tips";
 import { ShopGrid } from "./shop-grid";
+import { PartnersSection, CertificatesSection, BranchesSection, ContactSection } from "./trust-sections";
 
 async function toCardData(
   products: {
@@ -168,6 +169,22 @@ export default async function ShopHomePage({
 
       <PageContainer>
         <HealthTips />
+      </PageContainer>
+
+      <PageContainer>
+        <BranchesSection />
+      </PageContainer>
+
+      <PageContainer>
+        <PartnersSection />
+      </PageContainer>
+
+      <PageContainer>
+        <CertificatesSection />
+      </PageContainer>
+
+      <PageContainer>
+        <ContactSection />
       </PageContainer>
 
       <PageContainer>
