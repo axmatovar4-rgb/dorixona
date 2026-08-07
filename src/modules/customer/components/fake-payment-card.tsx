@@ -27,12 +27,14 @@ export function FakePaymentCard({
   providerLabel,
   amount,
   onValidChange,
+  forceCardType,
 }: {
   providerLabel: string;
   amount: number;
   onValidChange: (valid: boolean) => void;
+  forceCardType?: CardType;
 }) {
-  const [cardType, setCardType] = React.useState<CardType>("SIMPLE");
+  const [cardType, setCardType] = React.useState<CardType>(forceCardType ?? "SIMPLE");
   const [cardNumber, setCardNumber] = React.useState("");
   const [expiry, setExpiry] = React.useState("");
   const [cvv, setCvv] = React.useState("");
@@ -63,28 +65,30 @@ export function FakePaymentCard({
           <CreditCard className="h-4 w-4 text-primary" />
           {providerLabel} orqali to&apos;lov
         </p>
-        <div className="flex items-center gap-1 rounded-full bg-muted p-1 text-xs">
-          <button
-            type="button"
-            onClick={() => setCardType("SIMPLE")}
-            className={cn(
-              "rounded-full px-3 py-1 font-medium transition-colors",
-              cardType === "SIMPLE" ? "bg-background shadow-sm text-primary" : "text-muted-foreground"
-            )}
-          >
-            Oddiy karta
-          </button>
-          <button
-            type="button"
-            onClick={() => setCardType("VISA")}
-            className={cn(
-              "rounded-full px-3 py-1 font-medium transition-colors",
-              cardType === "VISA" ? "bg-background shadow-sm text-primary" : "text-muted-foreground"
-            )}
-          >
-            Visa / Mastercard
-          </button>
-        </div>
+        {!forceCardType && (
+          <div className="flex items-center gap-1 rounded-full bg-muted p-1 text-xs">
+            <button
+              type="button"
+              onClick={() => setCardType("SIMPLE")}
+              className={cn(
+                "rounded-full px-3 py-1 font-medium transition-colors",
+                cardType === "SIMPLE" ? "bg-background shadow-sm text-primary" : "text-muted-foreground"
+              )}
+            >
+              Oddiy karta
+            </button>
+            <button
+              type="button"
+              onClick={() => setCardType("VISA")}
+              className={cn(
+                "rounded-full px-3 py-1 font-medium transition-colors",
+                cardType === "VISA" ? "bg-background shadow-sm text-primary" : "text-muted-foreground"
+              )}
+            >
+              Visa / Mastercard
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">

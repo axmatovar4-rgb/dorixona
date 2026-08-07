@@ -264,6 +264,7 @@ export function CheckoutForm({ addresses }: { addresses: Address[] }) {
               providerLabel={PAYMENT_OPTIONS.find((o) => o.value === paymentMethod)?.label ?? ""}
               amount={total}
               onValidChange={setOnlinePaymentValid}
+              forceCardType={paymentMethod === "VISA" ? "VISA" : undefined}
             />
           )}
         </div>
