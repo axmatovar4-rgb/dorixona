@@ -15,6 +15,7 @@ export async function PharmaMedSection() {
       <SectionHeader
         title="PharmaMed"
         subtitle="Dorixonamizning o'z shifoxonasi — malakali shifokorlardan qabulga yoziling"
+        href="/pharmamed"
       />
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
         {doctors.map((doctor) => (

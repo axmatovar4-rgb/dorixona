@@ -33,7 +33,7 @@ export default async function DoctorProfilePage({
   return (
     <PageContainer className="flex flex-col gap-8 py-8 sm:py-12">
       <nav className="text-sm text-muted-foreground">
-        <Link href="/shop#pharmamed" className="hover:text-primary">
+        <Link href="/pharmamed" className="hover:text-primary">
           PharmaMed
         </Link>
         <span className="mx-1.5">/</span>
