@@ -13,6 +13,7 @@ import {
   LogOut,
   Pill,
   Stethoscope,
+  MessageSquareText,
 } from "lucide-react";
 import { LogoMark } from "@/components/logo";
 import { Button } from "@/components/ui/button";
@@ -152,6 +153,10 @@ export function PortalHeader({ customerName }: { customerName: string | null }) 
                 <DropdownMenuItem render={<Link href="/account/addresses" />}>
                   <MapPin className="h-4 w-4" />
                   Manzillarim
+                </DropdownMenuItem>
+                <DropdownMenuItem render={<Link href="/account/feedback" />}>
+                  <MessageSquareText className="h-4 w-4" />
+                  Fikr bildirish
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem variant="destructive" onClick={() => signOutAction()}>

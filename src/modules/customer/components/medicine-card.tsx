@@ -7,7 +7,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/modules/customer/cart-context";
 import { RatingStars } from "@/modules/customer/components/rating-stars";
-import { derivedRating } from "@/modules/customer/rating";
 import { cn } from "@/lib/utils";
 
 export type MedicineCardData = {
@@ -18,6 +17,7 @@ export type MedicineCardData = {
   sellPrice: string | number;
   oldPrice?: string | number | null;
   promo?: { code: string; discountPercent: number } | null;
+  rating?: { avg: number; count: number } | null;
   prescriptionRequired: boolean;
   imageUrl?: string | null;
   category?: string | null;
@@ -37,7 +37,6 @@ export function MedicineCard({
   const oldPrice = product.oldPrice != null ? Number(product.oldPrice) : null;
   const hasDiscount = oldPrice != null && oldPrice > price;
   const discountPercent = hasDiscount ? Math.round(((oldPrice - price) / oldPrice) * 100) : 0;
-  const rating = derivedRating(product.id);
 
   return (
     <div
@@ -84,7 +83,7 @@ export function MedicineCard({
           {product.name}
           {product.dosage ? ` · ${product.dosage}` : ""}
         </Link>
-        <RatingStars value={rating} />
+        <RatingStars value={product.rating?.avg ?? 0} count={product.rating?.count ?? 0} />
         <div className="mt-auto flex flex-wrap items-baseline gap-x-2 pt-2">
           <p
             className={cn(

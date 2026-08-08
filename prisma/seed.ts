@@ -231,6 +231,7 @@ async function main() {
     "promoCodes",
     "doctors",
     "deliveryZones",
+    "feedback",
   ] as const;
 
   const ROLE_MODULE_ACTIONS: Record<string, Record<string, string[]>> = {
@@ -269,6 +270,7 @@ async function main() {
       promoCodes: WRITE_ACTIONS,
       doctors: WRITE_ACTIONS,
       deliveryZones: WRITE_ACTIONS,
+      feedback: READ_ACTIONS,
     },
     ACCOUNTANT: {
       finance: ALL_ACTIONS,

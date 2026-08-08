@@ -10,6 +10,7 @@ import { ShopGrid } from "./shop-grid";
 import { PartnersSection, CertificatesSection, BranchesSection, ContactSection } from "./trust-sections";
 import { PharmaMedSection } from "./pharmamed-section";
 import { getActivePromoMap } from "@/modules/customer/promo-map";
+import { getRatingsMap } from "@/modules/customer/ratings-map";
 
 async function toCardData(
   products: {
@@ -32,6 +33,7 @@ async function toCardData(
   });
   const stockMap = new Map(stockByProduct.map((s) => [s.productId, s._sum.quantity ?? 0]));
   const promoMap = await getActivePromoMap(products.map((p) => p.id));
+  const ratingsMap = await getRatingsMap(products.map((p) => p.id));
 
   return products.map((p) => ({
     id: p.id,
@@ -41,6 +43,7 @@ async function toCardData(
     sellPrice: String(p.sellPrice),
     oldPrice: p.oldPrice != null ? String(p.oldPrice) : null,
     promo: promoMap.get(p.id) ?? null,
+    rating: ratingsMap.get(p.id) ?? { avg: 0, count: 0 },
     prescriptionRequired: p.prescriptionRequired,
     imageUrl: p.imageUrl,
     category: p.category?.name ?? null,

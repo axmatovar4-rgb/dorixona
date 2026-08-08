@@ -16,12 +16,14 @@ import { prisma } from "@/lib/prisma";
 import { Badge } from "@/components/ui/badge";
 import { PageContainer, SectionHeader } from "@/modules/customer/components/section";
 import { RatingStars } from "@/modules/customer/components/rating-stars";
-import { derivedRating } from "@/modules/customer/rating";
 import { MedicineCard, type MedicineCardData } from "@/modules/customer/components/medicine-card";
 import { AddToCart } from "@/modules/customer/components/add-to-cart";
 import { StockAlertButton } from "@/modules/customer/components/stock-alert-button";
 import { getFrequentlyBoughtWith } from "@/modules/customer/recommendations";
 import { getActivePromoMap } from "@/modules/customer/promo-map";
+import { getRatingsMap } from "@/modules/customer/ratings-map";
+import { ProductReviews } from "@/modules/reviews/components/product-reviews";
+import { auth } from "@/lib/auth";
 import { StickyAddToCart } from "./sticky-add-to-cart";
 
 export async function generateMetadata({
@@ -40,6 +42,7 @@ export default async function ShopProductPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  const session = await auth();
 
   const product = await prisma.product.findUnique({
     where: { id },
@@ -47,7 +50,7 @@ export default async function ShopProductPage({
   });
   if (!product || !product.isActive) notFound();
 
-  const [stock, similarRaw, frequentlyBoughtWith] = await Promise.all([
+  const [stock, similarRaw, frequentlyBoughtWith, reviews] = await Promise.all([
     prisma.batch.aggregate({
       where: { productId: id, quantity: { gt: 0 } },
       _sum: { quantity: true },
@@ -62,9 +65,25 @@ export default async function ShopProductPage({
       take: 4,
     }),
     getFrequentlyBoughtWith(id),
+    prisma.review.findMany({
+      where: { productId: id },
+      orderBy: { createdAt: "desc" },
+      include: { customer: { select: { firstName: true, lastName: true } } },
+    }),
   ]);
   const inStock = (stock._sum.quantity ?? 0) > 0;
-  const rating = derivedRating(product.id);
+  const ratingCount = reviews.length;
+  const ratingAvg = ratingCount > 0 ? reviews.reduce((sum, r) => sum + r.rating, 0) / ratingCount : 0;
+
+  const canReview =
+    !!session?.user &&
+    session.user.type === "CUSTOMER" &&
+    (await prisma.orderItem.findFirst({
+      where: { productId: id, order: { customerId: session.user.id, status: "DELIVERED" } },
+    })) !== null;
+  const myReview = session?.user
+    ? reviews.find((r) => r.customerId === session.user.id) ?? null
+    : null;
 
   const similarStock = await prisma.batch.groupBy({
     by: ["productId"],
@@ -73,6 +92,7 @@ export default async function ShopProductPage({
   });
   const similarStockMap = new Map(similarStock.map((s) => [s.productId, s._sum.quantity ?? 0]));
   const promoMap = await getActivePromoMap([id, ...similarRaw.map((p) => p.id)]);
+  const similarRatingsMap = await getRatingsMap(similarRaw.map((p) => p.id));
   const productPromo = promoMap.get(id) ?? null;
   const similar: MedicineCardData[] = similarRaw.map((p) => ({
     id: p.id,
@@ -82,6 +102,7 @@ export default async function ShopProductPage({
     sellPrice: String(p.sellPrice),
     oldPrice: p.oldPrice != null ? String(p.oldPrice) : null,
     promo: promoMap.get(p.id) ?? null,
+    rating: similarRatingsMap.get(p.id) ?? { avg: 0, count: 0 },
     prescriptionRequired: p.prescriptionRequired,
     imageUrl: p.imageUrl,
     category: p.category?.name ?? null,
@@ -132,7 +153,7 @@ export default async function ShopProductPage({
             <h1 className="mt-1 text-3xl font-bold tracking-tight sm:text-4xl">{product.name}</h1>
             {product.dosage && <p className="mt-1 text-muted-foreground">{product.dosage}</p>}
             <div className="mt-3 flex items-center gap-3">
-              <RatingStars value={rating} />
+              <RatingStars value={ratingAvg} count={ratingCount} />
               <Badge variant={inStock ? "secondary" : "destructive"}>{inStock ? "Mavjud" : "Tugagan"}</Badge>
             </div>
           </div>
@@ -266,6 +287,22 @@ export default async function ShopProductPage({
           </div>
         </div>
       )}
+
+      <div>
+        <SectionHeader title="Fikrlar" subtitle="Bu doridan foydalangan mijozlarning bahosi" />
+        <ProductReviews
+          productId={product.id}
+          reviews={reviews.map((r) => ({
+            id: r.id,
+            rating: r.rating,
+            comment: r.comment,
+            createdAt: r.createdAt,
+            customerName: `${r.customer.firstName} ${r.customer.lastName[0]}.`,
+          }))}
+          canReview={canReview}
+          myReview={myReview ? { rating: myReview.rating, comment: myReview.comment } : null}
+        />
+      </div>
 
       <StickyAddToCart
         productId={product.id}

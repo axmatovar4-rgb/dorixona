@@ -17,6 +17,7 @@ import {
   CalendarCheck,
   MapPinned,
   KeyRound,
+  MessageSquareText,
   type LucideIcon,
 } from "lucide-react";
 
@@ -59,6 +60,7 @@ export const NAV_ITEMS: NavItem[] = [
   { title: "Qabullar", href: "/appointments", icon: CalendarCheck },
   { title: "Yetkazib berish hududlari", href: "/delivery-zones", icon: MapPinned },
   { title: "Foydalanuvchilar", href: "/users", icon: KeyRound },
+  { title: "Fikrlar", href: "/feedback", icon: MessageSquareText },
   {
     title: "Sotuvlar",
     icon: ScanBarcode,
