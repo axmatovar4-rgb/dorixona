@@ -130,33 +130,41 @@ export function AIChatSheet() {
             </div>
           )}
 
-          {messages.map((m) => (
-            <div
-              key={m.id}
-              className={cn("flex gap-2.5", m.role === "user" && "flex-row-reverse")}
-            >
+          {messages.map((m, index) => {
+            const isStreaming = pending && m.role === "assistant" && index === messages.length - 1;
+            return (
               <div
-                className={cn(
-                  "flex h-7 w-7 shrink-0 items-center justify-center rounded-full",
-                  m.role === "assistant" ? "bg-primary/10 text-primary" : "bg-muted text-foreground"
-                )}
+                key={m.id}
+                className={cn("flex gap-2.5", m.role === "user" && "flex-row-reverse")}
               >
-                {m.role === "assistant" ? <Sparkles className="h-3.5 w-3.5" /> : <User className="h-3.5 w-3.5" />}
+                <div
+                  className={cn(
+                    "flex h-7 w-7 shrink-0 items-center justify-center rounded-full",
+                    m.role === "assistant" ? "bg-primary/10 text-primary" : "bg-muted text-foreground"
+                  )}
+                >
+                  {m.role === "assistant" ? <Sparkles className="h-3.5 w-3.5" /> : <User className="h-3.5 w-3.5" />}
+                </div>
+                <div
+                  className={cn(
+                    "max-w-[80%] rounded-2xl px-3.5 py-2.5 text-sm whitespace-pre-wrap",
+                    m.role === "assistant"
+                      ? "bg-muted/70 text-foreground"
+                      : "bg-primary text-primary-foreground"
+                  )}
+                >
+                  {m.text}
+                  {isStreaming && (
+                    <span className="ml-1 inline-flex items-center gap-0.5 align-middle">
+                      <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-current opacity-60 [animation-delay:-0.3s]" />
+                      <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-current opacity-60 [animation-delay:-0.15s]" />
+                      <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-current opacity-60" />
+                    </span>
+                  )}
+                </div>
               </div>
-              <div
-                className={cn(
-                  "max-w-[80%] rounded-2xl px-3.5 py-2.5 text-sm whitespace-pre-wrap",
-                  m.role === "assistant"
-                    ? "bg-muted/70 text-foreground"
-                    : "bg-primary text-primary-foreground"
-                )}
-              >
-                {m.text || (pending && m.role === "assistant" ? (
-                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                ) : null)}
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         <div className="border-t bg-card/60 px-5 py-3">
