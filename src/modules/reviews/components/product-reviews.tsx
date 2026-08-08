@@ -4,7 +4,8 @@ import * as React from "react";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { toast } from "sonner";
-import { Star, Loader2, User } from "lucide-react";
+import Link from "next/link";
+import { Star, Loader2, User, LogIn, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
@@ -22,11 +23,13 @@ export function ProductReviews({
   productId,
   reviews,
   canReview,
+  isLoggedIn,
   myReview,
 }: {
   productId: string;
   reviews: Review[];
   canReview: boolean;
+  isLoggedIn: boolean;
   myReview: { rating: number; comment: string | null } | null;
 }) {
   const router = useRouter();
@@ -53,6 +56,21 @@ export function ProductReviews({
 
   return (
     <div className="flex flex-col gap-4">
+      {!canReview && !isLoggedIn && (
+        <div className="flex flex-col items-center gap-2 rounded-2xl border bg-muted/30 p-5 text-center">
+          <p className="text-sm text-muted-foreground">Baho qoldirish uchun tizimga kiring</p>
+          <Button size="sm" className="gap-1.5 rounded-full" render={<Link href={`/login?callbackUrl=/shop/${productId}`} />}>
+            <LogIn className="h-3.5 w-3.5" />
+            Tizimga kirish
+          </Button>
+        </div>
+      )}
+      {!canReview && isLoggedIn && (
+        <div className="flex items-center gap-2 rounded-2xl border bg-muted/30 p-4 text-sm text-muted-foreground">
+          <ShoppingBag className="h-4 w-4 shrink-0" />
+          Faqat sotib olib, yetkazib berilgan mahsulotga baho qoldirish mumkin.
+        </div>
+      )}
       {canReview && (
         <div className="flex flex-col gap-3 rounded-2xl border bg-card p-5 portal-shadow-sm">
           <p className="text-sm font-medium">{myReview ? "Bahoyingizni tahrirlang" : "Bahoyingizni qoldiring"}</p>
@@ -72,7 +90,7 @@ export function ProductReviews({
                       "h-6 w-6 transition-colors",
                       starValue <= (hoverRating || rating)
                         ? "fill-primary text-primary"
-                        : "fill-muted text-muted"
+                        : "fill-muted-foreground/15 text-muted-foreground"
                     )}
                   />
                 </button>
@@ -113,7 +131,7 @@ export function ProductReviews({
                 {Array.from({ length: 5 }).map((_, i) => (
                   <Star
                     key={i}
-                    className={cn("h-3.5 w-3.5", i < r.rating ? "fill-primary text-primary" : "fill-muted text-muted")}
+                    className={cn("h-3.5 w-3.5", i < r.rating ? "fill-primary text-primary" : "fill-muted-foreground/15 text-muted-foreground")}
                   />
                 ))}
               </div>

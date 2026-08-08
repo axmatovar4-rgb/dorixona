@@ -300,6 +300,7 @@ export default async function ShopProductPage({
             customerName: `${r.customer.firstName} ${r.customer.lastName[0]}.`,
           }))}
           canReview={canReview}
+          isLoggedIn={!!session?.user && session.user.type === "CUSTOMER"}
           myReview={myReview ? { rating: myReview.rating, comment: myReview.comment } : null}
         />
       </div>

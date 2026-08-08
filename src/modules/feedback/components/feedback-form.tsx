@@ -60,7 +60,7 @@ export function FeedbackForm() {
                 <Star
                   className={cn(
                     "h-7 w-7 transition-colors",
-                    starValue <= (hoverRating || rating) ? "fill-primary text-primary" : "fill-muted text-muted"
+                    starValue <= (hoverRating || rating) ? "fill-primary text-primary" : "fill-muted-foreground/15 text-muted-foreground"
                   )}
                 />
               </button>
