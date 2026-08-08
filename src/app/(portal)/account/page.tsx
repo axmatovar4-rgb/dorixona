@@ -9,6 +9,7 @@ import {
   ChevronRight,
   ShoppingBag,
   Clock,
+  Stethoscope,
 } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -26,7 +27,7 @@ export const metadata: Metadata = { title: "Mening profilim" };
 export default async function AccountPage() {
   const session = await auth();
   await checkExpiryForCustomer(session!.user.id);
-  const [customer, orders, addresses] = await Promise.all([
+  const [customer, orders, addresses, upcomingAppointments] = await Promise.all([
     prisma.customer.findUnique({ where: { id: session!.user.id } }),
     prisma.order.findMany({
       where: { customerId: session!.user.id },
@@ -35,6 +36,12 @@ export default async function AccountPage() {
     prisma.address.findMany({
       where: { customerId: session!.user.id },
       orderBy: [{ isDefault: "desc" }, { createdAt: "desc" }],
+    }),
+    prisma.appointment.findMany({
+      where: { customerId: session!.user.id, status: "BOOKED" },
+      orderBy: { scheduledAt: "asc" },
+      include: { doctor: { select: { fullName: true, specialty: true } } },
+      take: 2,
     }),
   ]);
   if (!customer) notFound();
@@ -160,6 +167,32 @@ export default async function AccountPage() {
                   <div key={addr.id} className="rounded-xl bg-muted/50 p-3 text-sm">
                     {addr.label && <span className="font-medium">{addr.label}: </span>}
                     {addr.fullAddress}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="rounded-2xl border bg-card p-6 portal-shadow-sm">
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="flex items-center gap-2 font-semibold">
+                <Stethoscope className="h-4 w-4 text-primary" />
+                Qabullarim
+              </h2>
+              <Link href="/account/appointments" className="text-sm font-medium text-primary hover:underline">
+                Barchasi
+              </Link>
+            </div>
+            {upcomingAppointments.length === 0 ? (
+              <p className="text-sm text-muted-foreground">Hali qabulga yozilmagansiz</p>
+            ) : (
+              <div className="flex flex-col gap-2">
+                {upcomingAppointments.map((a) => (
+                  <div key={a.id} className="rounded-xl bg-muted/50 p-3 text-sm">
+                    <p className="font-medium">{a.doctor.fullName}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {a.doctor.specialty} · {format(a.scheduledAt, "dd.MM.yyyy HH:mm")}
+                    </p>
                   </div>
                 ))}
               </div>

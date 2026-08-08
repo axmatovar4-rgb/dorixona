@@ -107,6 +107,21 @@ enum StaffNotificationType {
   NEW_ORDER
 }
 
+enum Weekday {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+
+enum AppointmentStatus {
+  BOOKED
+  CANCELLED
+}
+
 // ---------- Core / Org ----------
 
 model User {
@@ -151,6 +166,39 @@ model Customer {
   notifications Notification[]
   stockAlerts   StockAlertSubscription[]
   notes         CustomerNote[]
+  appointments  Appointment[]
+}
+
+model Doctor {
+  id            String    @id @default(cuid())
+  fullName      String
+  specialty     String
+  age           Int
+  photoUrl      String?
+  bio           String?
+  workDays      Weekday[]
+  workStartTime String
+  workEndTime   String
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+
+  appointments Appointment[]
+}
+
+model Appointment {
+  id          String            @id @default(cuid())
+  doctorId    String
+  doctor      Doctor            @relation(fields: [doctorId], references: [id])
+  customerId  String
+  customer    Customer          @relation(fields: [customerId], references: [id])
+  scheduledAt DateTime
+  status      AppointmentStatus @default(BOOKED)
+  note        String?
+  createdAt   DateTime          @default(now())
+
+  @@unique([doctorId, scheduledAt])
+  @@index([customerId])
+  @@index([doctorId])
 }
 
 model Address {

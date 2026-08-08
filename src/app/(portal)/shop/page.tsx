@@ -8,6 +8,7 @@ import { AIBanner } from "@/modules/customer/components/ai-banner";
 import { HealthTips } from "./health-tips";
 import { ShopGrid } from "./shop-grid";
 import { PartnersSection, CertificatesSection, BranchesSection, ContactSection } from "./trust-sections";
+import { PharmaMedSection } from "./pharmamed-section";
 import { getActivePromoMap } from "@/modules/customer/promo-map";
 
 async function toCardData(
@@ -170,6 +171,10 @@ export default async function ShopHomePage({
             <MedicineCard key={p.id} product={p} />
           ))}
         </div>
+      </PageContainer>
+
+      <PageContainer>
+        <PharmaMedSection />
       </PageContainer>
 
       <PageContainer>

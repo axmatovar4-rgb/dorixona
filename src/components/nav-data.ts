@@ -13,6 +13,8 @@ import {
   Settings,
   History,
   Percent,
+  Stethoscope,
+  CalendarCheck,
   type LucideIcon,
 } from "lucide-react";
 
@@ -51,6 +53,8 @@ export const NAV_ITEMS: NavItem[] = [
   },
   { title: "Xaridlar", href: "/procurement", icon: Truck },
   { title: "Aksiya kodlari", href: "/promo-codes", icon: Percent },
+  { title: "Shifokorlar", href: "/doctors", icon: Stethoscope },
+  { title: "Qabullar", href: "/appointments", icon: CalendarCheck },
   {
     title: "Sotuvlar",
     icon: ScanBarcode,
