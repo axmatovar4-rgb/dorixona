@@ -34,19 +34,32 @@ export type AddressInput = z.infer<typeof addressSchema>;
 
 export const PAYMENT_METHODS = ["CASH_ON_DELIVERY", "CLICK", "PAYME", "UZCARD", "HUMO", "VISA"] as const;
 
-export const checkoutSchema = z.object({
-  addressId: z.string().min(1, "Manzilni tanlang"),
-  paymentMethod: z.enum(PAYMENT_METHODS),
-  courierNote: z.string().trim().max(300, "Ko'pi bilan 300 ta belgi").optional().or(z.literal("")),
-  promoCode: z.string().trim().max(20).optional().or(z.literal("")),
-  deliveryZoneId: z.string().optional().or(z.literal("")),
-  items: z
-    .array(
-      z.object({
-        productId: z.string(),
-        quantity: z.number().int().positive(),
-      })
-    )
-    .min(1, "Savat bo'sh"),
-});
+export const DELIVERY_METHODS = ["DELIVERY", "PICKUP"] as const;
+
+export const checkoutSchema = z
+  .object({
+    deliveryMethod: z.enum(DELIVERY_METHODS),
+    addressId: z.string().optional().or(z.literal("")),
+    pickupBranchId: z.string().optional().or(z.literal("")),
+    paymentMethod: z.enum(PAYMENT_METHODS),
+    courierNote: z.string().trim().max(300, "Ko'pi bilan 300 ta belgi").optional().or(z.literal("")),
+    promoCode: z.string().trim().max(20).optional().or(z.literal("")),
+    deliveryZoneId: z.string().optional().or(z.literal("")),
+    items: z
+      .array(
+        z.object({
+          productId: z.string(),
+          quantity: z.number().int().positive(),
+        })
+      )
+      .min(1, "Savat bo'sh"),
+  })
+  .refine((d) => d.deliveryMethod !== "DELIVERY" || !!d.addressId, {
+    message: "Manzilni tanlang",
+    path: ["addressId"],
+  })
+  .refine((d) => d.deliveryMethod !== "PICKUP" || !!d.pickupBranchId, {
+    message: "Filialni tanlang",
+    path: ["pickupBranchId"],
+  });
 export type CheckoutInput = z.infer<typeof checkoutSchema>;

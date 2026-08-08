@@ -23,11 +23,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { createBranchFull, toggleBranchActive } from "@/modules/branches/actions";
+import { UZ_REGIONS } from "@/lib/uzbekistan-regions";
 
 type ManagerOption = { id: string; name: string };
 type Branch = {
   id: string;
   name: string;
+  region: string | null;
   address: string | null;
   phone: string | null;
   isActive: boolean;
@@ -46,6 +48,7 @@ export function BranchFullManager({
 }) {
   const router = useRouter();
   const [name, setName] = React.useState("");
+  const [region, setRegion] = React.useState("");
   const [address, setAddress] = React.useState("");
   const [phone, setPhone] = React.useState("");
   const [managerId, setManagerId] = React.useState("");
@@ -54,13 +57,14 @@ export function BranchFullManager({
   async function handleAdd(e: React.FormEvent) {
     e.preventDefault();
     setPending(true);
-    const result = await createBranchFull({ name, address, phone, managerId });
+    const result = await createBranchFull({ name, region, address, phone, managerId });
     setPending(false);
     if (result?.error) {
       toast.error(result.error);
       return;
     }
     setName("");
+    setRegion("");
     setAddress("");
     setPhone("");
     setManagerId("");
@@ -75,6 +79,21 @@ export function BranchFullManager({
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-medium">Nomi</label>
             <Input value={name} onChange={(e) => setName(e.target.value)} required className="w-44" />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-medium">Shahar / tuman</label>
+            <Select items={UZ_REGIONS.map((r) => ({ value: r, label: r }))} value={region} onValueChange={(v) => setRegion((v as string) ?? "")}>
+              <SelectTrigger className="w-44">
+                <SelectValue placeholder="Tanlang" />
+              </SelectTrigger>
+              <SelectContent>
+                {UZ_REGIONS.map((r) => (
+                  <SelectItem key={r} value={r}>
+                    {r}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-medium">Manzil</label>
@@ -110,6 +129,7 @@ export function BranchFullManager({
         <TableHeader>
           <TableRow>
             <TableHead>Nomi</TableHead>
+            <TableHead>Shahar/tuman</TableHead>
             <TableHead>Manzil</TableHead>
             <TableHead>Telefon</TableHead>
             <TableHead>Menejer</TableHead>
@@ -120,7 +140,7 @@ export function BranchFullManager({
         <TableBody>
           {branches.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={6} className="h-20 text-center text-muted-foreground">
+              <TableCell colSpan={7} className="h-20 text-center text-muted-foreground">
                 Filiallar mavjud emas
               </TableCell>
             </TableRow>
@@ -128,6 +148,7 @@ export function BranchFullManager({
             branches.map((b) => (
               <TableRow key={b.id}>
                 <TableCell className="font-medium">{b.name}</TableCell>
+                <TableCell>{b.region || "—"}</TableCell>
                 <TableCell>{b.address || "—"}</TableCell>
                 <TableCell>{b.phone || "—"}</TableCell>
                 <TableCell>{b.manager?.name || "—"}</TableCell>

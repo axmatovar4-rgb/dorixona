@@ -29,7 +29,7 @@ export default async function OrderDetailPage({
 
   const order = await prisma.order.findUnique({
     where: { id },
-    include: { items: { include: { product: true } }, address: true },
+    include: { items: { include: { product: true } }, address: true, pickupBranch: true },
   });
   if (!order || order.customerId !== session!.user.id) notFound();
 
@@ -130,9 +130,16 @@ export default async function OrderDetailPage({
         <div className="rounded-2xl border bg-card p-5 portal-shadow-sm">
           <h2 className="mb-2 flex items-center gap-2 text-sm font-semibold text-muted-foreground">
             <MapPin className="h-4 w-4 text-primary" />
-            Manzil
+            {order.deliveryMethod === "PICKUP" ? "Olib ketish filiali" : "Manzil"}
           </h2>
-          <p className="font-medium">{order.address.fullAddress}</p>
+          <p className="font-medium">
+            {order.deliveryMethod === "PICKUP"
+              ? order.pickupBranch?.name ?? "—"
+              : order.address?.fullAddress ?? "—"}
+          </p>
+          {order.deliveryMethod === "PICKUP" && order.pickupBranch?.address && (
+            <p className="mt-1 text-xs text-muted-foreground">{order.pickupBranch.address}</p>
+          )}
           {order.courierNote && (
             <p className="mt-2 rounded-lg bg-muted px-2.5 py-1.5 text-xs text-muted-foreground">
               Kuryerga izoh: {order.courierNote}

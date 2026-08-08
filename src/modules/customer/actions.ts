@@ -164,11 +164,23 @@ export async function createOrder(input: CheckoutInput) {
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "Ma'lumotlar noto'g'ri" };
   }
-  const { addressId, paymentMethod, courierNote, promoCode, deliveryZoneId, items } = parsed.data;
+  const { deliveryMethod, addressId, pickupBranchId, paymentMethod, courierNote, promoCode, deliveryZoneId, items } =
+    parsed.data;
 
-  const address = await prisma.address.findUnique({ where: { id: addressId } });
-  if (!address || address.customerId !== session.user.id) {
-    return { error: "Manzil topilmadi" };
+  let resolvedAddressId: string | null = null;
+  let resolvedPickupBranchId: string | null = null;
+  if (deliveryMethod === "DELIVERY") {
+    const address = await prisma.address.findUnique({ where: { id: addressId } });
+    if (!address || address.customerId !== session.user.id) {
+      return { error: "Manzil topilmadi" };
+    }
+    resolvedAddressId = address.id;
+  } else {
+    const branch = await prisma.branch.findUnique({ where: { id: pickupBranchId } });
+    if (!branch || !branch.isActive) {
+      return { error: "Filial topilmadi" };
+    }
+    resolvedPickupBranchId = branch.id;
   }
 
   const products = await prisma.product.findMany({
@@ -211,9 +223,9 @@ export async function createOrder(input: CheckoutInput) {
     discountAmount = Math.round((eligibleSubtotal * found.discountPercent) / 100);
     appliedCode = found.code;
   }
-  let deliveryFee: number = DELIVERY_FEE;
+  let deliveryFee: number = deliveryMethod === "PICKUP" ? 0 : DELIVERY_FEE;
   let deliveryZoneName: string | null = null;
-  if (deliveryZoneId) {
+  if (deliveryMethod === "DELIVERY" && deliveryZoneId) {
     const zone = await prisma.deliveryZone.findUnique({ where: { id: deliveryZoneId } });
     if (zone && zone.isActive) {
       deliveryFee = Number(zone.fee);
@@ -228,7 +240,9 @@ export async function createOrder(input: CheckoutInput) {
       const order = await tx.order.create({
         data: {
           customerId: session.user.id,
-          addressId,
+          addressId: resolvedAddressId,
+          deliveryMethod,
+          pickupBranchId: resolvedPickupBranchId,
           paymentMethod,
           subtotal,
           deliveryFee,

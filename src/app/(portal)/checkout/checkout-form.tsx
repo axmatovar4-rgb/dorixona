@@ -16,12 +16,14 @@ import {
   MessageSquareText,
   Tag,
   X,
+  Truck,
+  Store,
 } from "lucide-react";
 import { useCart } from "@/modules/customer/cart-context";
 import { DELIVERY_FEE } from "@/modules/customer/constants";
 import { createOrder, createAddress } from "@/modules/customer/actions";
 import { detectCurrentAddress } from "@/modules/customer/geolocation";
-import { PAYMENT_METHODS } from "@/modules/customer/schemas";
+import { PAYMENT_METHODS, DELIVERY_METHODS } from "@/modules/customer/schemas";
 import { checkPromoCode } from "@/modules/promo/actions";
 import { PaymeLogo, ClickLogo, HumoLogo, UzcardLogo, VisaLogo, CashCoinIcon } from "@/components/payment-logos";
 import { Button } from "@/components/ui/button";
@@ -32,6 +34,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PageContainer } from "@/modules/customer/components/section";
 import { FakePaymentCard } from "@/modules/customer/components/fake-payment-card";
+import { BranchPicker, type BranchOption } from "@/modules/customer/components/branch-picker";
 import { cn } from "@/lib/utils";
 
 type Address = {
@@ -56,9 +59,20 @@ const PAYMENT_OPTIONS: {
   { value: "VISA", label: "Visa", logo: VisaLogo },
 ];
 
-export function CheckoutForm({ addresses, zones }: { addresses: Address[]; zones: Zone[] }) {
+export function CheckoutForm({
+  addresses,
+  zones,
+  branches,
+}: {
+  addresses: Address[];
+  zones: Zone[];
+  branches: BranchOption[];
+}) {
   const router = useRouter();
   const { items, subtotal, clear } = useCart();
+
+  const [deliveryMethod, setDeliveryMethod] = React.useState<(typeof DELIVERY_METHODS)[number]>("DELIVERY");
+  const [pickupBranchId, setPickupBranchId] = React.useState("");
 
   const [addressId, setAddressId] = React.useState(
     addresses.find((a) => a.isDefault)?.id ?? addresses[0]?.id ?? ""
@@ -67,7 +81,7 @@ export function CheckoutForm({ addresses, zones }: { addresses: Address[]; zones
     zones.find((z) => z.isDefault)?.id ?? zones[0]?.id ?? ""
   );
   const selectedZone = zones.find((z) => z.id === zoneId);
-  const deliveryFee = selectedZone ? selectedZone.fee : DELIVERY_FEE;
+  const deliveryFee = deliveryMethod === "PICKUP" ? 0 : selectedZone ? selectedZone.fee : DELIVERY_FEE;
   const [showNewAddress, setShowNewAddress] = React.useState(addresses.length === 0);
   const [newAddress, setNewAddress] = React.useState("");
   const [savingAddress, setSavingAddress] = React.useState(false);
@@ -158,8 +172,12 @@ export function CheckoutForm({ addresses, zones }: { addresses: Address[]; zones
   }
 
   async function handleSubmit() {
-    if (!addressId) {
+    if (deliveryMethod === "DELIVERY" && !addressId) {
       toast.error("Yetkazib berish manzilini tanlang");
+      return;
+    }
+    if (deliveryMethod === "PICKUP" && !pickupBranchId) {
+      toast.error("Filialni tanlang");
       return;
     }
     if (isOnlinePayment && !onlinePaymentValid) {
@@ -168,11 +186,13 @@ export function CheckoutForm({ addresses, zones }: { addresses: Address[]; zones
     }
     setSubmitting(true);
     const result = await createOrder({
-      addressId,
+      deliveryMethod,
+      addressId: deliveryMethod === "DELIVERY" ? addressId : "",
+      pickupBranchId: deliveryMethod === "PICKUP" ? pickupBranchId : "",
       paymentMethod,
       courierNote: courierNote.trim(),
       promoCode: appliedPromo?.code ?? "",
-      deliveryZoneId: zoneId || "",
+      deliveryZoneId: deliveryMethod === "DELIVERY" ? zoneId || "" : "",
       items: items.map((i) => ({ productId: i.productId, quantity: i.quantity })),
     });
     setSubmitting(false);
@@ -206,8 +226,36 @@ export function CheckoutForm({ addresses, zones }: { addresses: Address[]; zones
         <div className="rounded-2xl border bg-card p-6 portal-shadow-sm">
           <h2 className="mb-4 flex items-center gap-2 font-semibold">
             <MapPin className="h-4 w-4 text-primary" />
-            Yetkazib berish manzili
+            Buyurtmani qanday olasiz?
           </h2>
+          <div className="mb-4 grid grid-cols-2 gap-2.5">
+            <button
+              type="button"
+              onClick={() => setDeliveryMethod("DELIVERY")}
+              className={cn(
+                "flex items-center justify-center gap-2 rounded-2xl border p-3.5 text-sm font-medium transition-all hover:border-primary/40",
+                deliveryMethod === "DELIVERY" ? "border-primary bg-primary/5 text-primary" : "border-border"
+              )}
+            >
+              <Truck className="h-4 w-4" />
+              Uyimga yetkazish
+            </button>
+            <button
+              type="button"
+              onClick={() => setDeliveryMethod("PICKUP")}
+              className={cn(
+                "flex items-center justify-center gap-2 rounded-2xl border p-3.5 text-sm font-medium transition-all hover:border-primary/40",
+                deliveryMethod === "PICKUP" ? "border-primary bg-primary/5 text-primary" : "border-border"
+              )}
+            >
+              <Store className="h-4 w-4" />
+              Filialdan olib ketish
+            </button>
+          </div>
+
+          {deliveryMethod === "PICKUP" ? (
+            <BranchPicker branches={branches} value={pickupBranchId} onChange={setPickupBranchId} />
+          ) : (
           <div className="flex flex-col gap-2.5">
             {addresses.map((addr) => (
               <button
@@ -276,21 +324,24 @@ export function CheckoutForm({ addresses, zones }: { addresses: Address[]; zones
               </Button>
             )}
           </div>
+          )}
 
-          <div className="mt-4 flex flex-col gap-1.5">
-            <label className="flex items-center gap-1.5 text-sm font-medium">
-              <MessageSquareText className="h-4 w-4 text-primary" />
-              Kuryerga izoh (ixtiyoriy)
-            </label>
-            <Textarea
-              placeholder="Masalan: eshik oldiga qo'ying, domofon ishlamaydi va h.k."
-              value={courierNote}
-              onChange={(e) => setCourierNote(e.target.value)}
-              maxLength={300}
-              className="rounded-xl"
-              rows={2}
-            />
-          </div>
+          {deliveryMethod === "DELIVERY" && (
+            <div className="mt-4 flex flex-col gap-1.5">
+              <label className="flex items-center gap-1.5 text-sm font-medium">
+                <MessageSquareText className="h-4 w-4 text-primary" />
+                Kuryerga izoh (ixtiyoriy)
+              </label>
+              <Textarea
+                placeholder="Masalan: eshik oldiga qo'ying, domofon ishlamaydi va h.k."
+                value={courierNote}
+                onChange={(e) => setCourierNote(e.target.value)}
+                maxLength={300}
+                className="rounded-xl"
+                rows={2}
+              />
+            </div>
+          )}
         </div>
 
         <div className="rounded-2xl border bg-card p-6 portal-shadow-sm">
@@ -399,7 +450,12 @@ export function CheckoutForm({ addresses, zones }: { addresses: Address[]; zones
               <span>-{discountAmount.toLocaleString("uz-UZ")} so&apos;m</span>
             </div>
           )}
-          {zones.length > 0 ? (
+          {deliveryMethod === "PICKUP" ? (
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">Filialdan olib ketish</span>
+              <span className="font-medium text-emerald-600 dark:text-emerald-400">Bepul</span>
+            </div>
+          ) : zones.length > 0 ? (
             <div className="flex flex-col gap-1.5 py-1">
               <span className="text-sm text-muted-foreground">Yetkazib berish hududi</span>
               <div className="flex items-center justify-between gap-2">

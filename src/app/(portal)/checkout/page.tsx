@@ -8,12 +8,13 @@ export const metadata: Metadata = { title: "Buyurtmani rasmiylashtirish" };
 
 export default async function CheckoutPage() {
   const session = await auth();
-  const [addresses, zonesRaw] = await Promise.all([
+  const [addresses, zonesRaw, branchesRaw] = await Promise.all([
     prisma.address.findMany({
       where: { customerId: session!.user.id },
       orderBy: [{ isDefault: "desc" }, { createdAt: "desc" }],
     }),
     prisma.deliveryZone.findMany({ where: { isActive: true }, orderBy: { sortOrder: "asc" } }),
+    prisma.branch.findMany({ where: { isActive: true }, orderBy: { name: "asc" } }),
   ]);
 
   return (
@@ -27,6 +28,7 @@ export default async function CheckoutPage() {
           isDefault: a.isDefault,
         }))}
         zones={zonesRaw.map((z) => ({ id: z.id, name: z.name, fee: Number(z.fee), isDefault: z.isDefault }))}
+        branches={branchesRaw.map((b) => ({ id: b.id, name: b.name, region: b.region, address: b.address }))}
       />
     </PageContainer>
   );

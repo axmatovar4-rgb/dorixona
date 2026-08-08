@@ -1,0 +1,40 @@
+export const UZ_CITIES = [
+  "Toshkent",
+  "Samarqand",
+  "Andijon",
+  "Namangan",
+  "Buxoro",
+  "Qarshi",
+  "Nukus",
+  "Farg'ona",
+  "Qo'qon",
+  "Marg'ilon",
+  "Termiz",
+  "Jizzax",
+  "Navoiy",
+  "Urganch",
+  "Chirchiq",
+  "Angren",
+  "Xiva",
+];
+
+export const UZ_DISTRICTS = [
+  "Urgut tumani",
+  "Denov tumani",
+  "Asaka tumani",
+  "Pastdarg'om tumani",
+  "Chust tumani",
+  "Kosonsoy tumani",
+  "Kitob tumani",
+  "Shahrisabz tumani",
+  "G'ijduvon tumani",
+  "Romitan tumani",
+  "Parkent tumani",
+  "Zangiota tumani",
+  "Bo'ka tumani",
+  "Yangiyo'l tumani",
+  "Qo'ng'irot tumani",
+  "Mo'ynoq tumani",
+];
+
+export const UZ_REGIONS = [...UZ_CITIES, ...UZ_DISTRICTS];

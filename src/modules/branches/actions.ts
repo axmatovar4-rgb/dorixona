@@ -6,7 +6,13 @@ import { prisma } from "@/lib/prisma";
 import { canAsync } from "@/lib/rbac-modules";
 import { logAudit } from "@/lib/audit";
 
-export async function createBranchFull(input: { name: string; address: string; phone: string; managerId: string }) {
+export async function createBranchFull(input: {
+  name: string;
+  region: string;
+  address: string;
+  phone: string;
+  managerId: string;
+}) {
   const session = await auth();
   if (!session?.user || session.user.type !== "STAFF" || !(await canAsync(session.user.role, "branchManagement", "create"))) {
     return { error: "Sizda ruxsat yo'q" };
@@ -16,6 +22,7 @@ export async function createBranchFull(input: { name: string; address: string; p
   const branch = await prisma.branch.create({
     data: {
       name: input.name,
+      region: input.region || null,
       address: input.address || null,
       phone: input.phone || null,
       managerId: input.managerId || null,

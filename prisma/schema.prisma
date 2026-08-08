@@ -215,12 +215,20 @@ model Address {
   orders Order[]
 }
 
+enum DeliveryMethod {
+  DELIVERY
+  PICKUP
+}
+
 model Order {
   id             String        @id @default(cuid())
   customerId     String
   customer       Customer      @relation(fields: [customerId], references: [id])
-  addressId      String
-  address        Address       @relation(fields: [addressId], references: [id])
+  addressId      String?
+  address        Address?      @relation(fields: [addressId], references: [id])
+  deliveryMethod DeliveryMethod @default(DELIVERY)
+  pickupBranchId String?
+  pickupBranch   Branch?       @relation("OrderPickupBranch", fields: [pickupBranchId], references: [id])
   status         OrderStatus   @default(PENDING)
   paymentMethod  PaymentMethod
   paymentStatus  PaymentStatus @default(PENDING)
@@ -337,6 +345,7 @@ model StockAlertSubscription {
 model Branch {
   id         String      @id @default(cuid())
   name       String
+  region     String?
   address    String?
   phone      String?
   isActive   Boolean     @default(true)
@@ -346,6 +355,7 @@ model Branch {
   updatedAt  DateTime    @updatedAt
   warehouses Warehouse[]
   users      User[]
+  pickupOrders Order[]   @relation("OrderPickupBranch")
 }
 
 model Warehouse {

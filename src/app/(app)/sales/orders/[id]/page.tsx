@@ -34,7 +34,7 @@ export default async function StaffOrderDetailPage({
 
   const order = await prisma.order.findUnique({
     where: { id },
-    include: { items: { include: { product: true } }, address: true, customer: true },
+    include: { items: { include: { product: true } }, address: true, customer: true, pickupBranch: true },
   });
   if (!order) notFound();
 
@@ -72,8 +72,14 @@ export default async function StaffOrderDetailPage({
             <p className="font-medium">{order.customer.phone}</p>
           </div>
           <div>
-            <span className="text-muted-foreground">Manzil</span>
-            <p className="font-medium">{order.address.fullAddress}</p>
+            <span className="text-muted-foreground">
+              {order.deliveryMethod === "PICKUP" ? "Olib ketish filiali" : "Manzil"}
+            </span>
+            <p className="font-medium">
+              {order.deliveryMethod === "PICKUP"
+                ? order.pickupBranch?.name ?? "—"
+                : order.address?.fullAddress ?? "—"}
+            </p>
           </div>
           <div>
             <span className="text-muted-foreground">To&apos;lov usuli</span>
