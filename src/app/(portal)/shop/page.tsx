@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { Hero } from "./hero";
-import { CategoryStrip } from "./category-strip";
 import { MedicineCard, type MedicineCardData } from "@/modules/customer/components/medicine-card";
 import { PageContainer, SectionHeader } from "@/modules/customer/components/section";
 import { AIBanner } from "@/modules/customer/components/ai-banner";
@@ -84,13 +83,7 @@ export default async function ShopHomePage({
     );
   }
 
-  const [newArrivalsRaw, featuredRaw, bestSellingAgg] = await Promise.all([
-    prisma.product.findMany({
-      where: { isActive: true },
-      include: { category: true, brand: true },
-      orderBy: { createdAt: "desc" },
-      take: 8,
-    }),
+  const [featuredRaw, bestSellingAgg] = await Promise.all([
     prisma.product.findMany({
       where: { isActive: true },
       include: { category: true, brand: true },
@@ -125,8 +118,7 @@ export default async function ShopHomePage({
     bestSellingProducts = [...bestSellingProducts, ...filler];
   }
 
-  const [newArrivals, featured, bestSelling] = await Promise.all([
-    toCardData(newArrivalsRaw),
+  const [featured, bestSelling] = await Promise.all([
     toCardData(featuredRaw),
     toCardData(bestSellingProducts),
   ]);
@@ -134,12 +126,6 @@ export default async function ShopHomePage({
   return (
     <div className="flex flex-col gap-16 pb-16 sm:gap-20">
       <Hero />
-
-      <PageContainer>
-        <CategoryStrip
-          categories={categories.map((c) => ({ id: c.id, name: c.name, count: c._count.products }))}
-        />
-      </PageContainer>
 
       <PageContainer>
         <SectionHeader
@@ -162,15 +148,6 @@ export default async function ShopHomePage({
         />
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
           {bestSelling.map((p) => (
-            <MedicineCard key={p.id} product={p} />
-          ))}
-        </div>
-      </PageContainer>
-
-      <PageContainer>
-        <SectionHeader title="Yangi qo'shilgan" subtitle="Katalogimizdagi so'nggi yangiliklar" href="/shop#catalog" />
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-          {newArrivals.map((p) => (
             <MedicineCard key={p.id} product={p} />
           ))}
         </div>

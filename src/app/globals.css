@@ -173,6 +173,15 @@
 .portal-shadow { box-shadow: var(--portal-shadow); }
 .portal-shadow-lg { box-shadow: var(--portal-shadow-lg); }
 
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.animate-marquee { animation: marquee var(--marquee-duration, 30s) linear infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee { animation: none; }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

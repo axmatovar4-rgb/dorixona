@@ -131,12 +131,12 @@ export default async function ShopProductPage({
       <div className="grid grid-cols-1 gap-10 lg:grid-cols-2">
         {/* Gallery */}
         <div className="flex flex-col gap-3">
-          <div className="relative flex aspect-square items-center justify-center overflow-hidden rounded-3xl border bg-gradient-to-br from-primary/8 via-accent to-secondary portal-shadow-sm">
+          <div className="relative mx-auto flex aspect-square w-full max-w-sm items-center justify-center overflow-hidden rounded-3xl border bg-gradient-to-br from-primary/8 via-accent to-secondary portal-shadow-sm">
             {product.imageUrl ? (
               // eslint-disable-next-line @next/next/no-img-element -- arbitrary external product image URL
               <img src={product.imageUrl} alt={product.name} className="h-full w-full object-cover" />
             ) : (
-              <Pill className="h-28 w-28 text-primary/25" />
+              <Pill className="h-20 w-20 text-primary/25" />
             )}
             {product.prescriptionRequired && (
               <Badge className="absolute top-4 left-4 border-0 bg-foreground/80 text-background backdrop-blur-sm">

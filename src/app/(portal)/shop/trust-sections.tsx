@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Factory, ShieldCheck, Award, BadgeCheck, FileCheck, MapPin, Phone, Mail, Clock } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { SectionHeader } from "@/modules/customer/components/section";
+import { Marquee } from "@/components/marquee";
 
 const CERTIFICATES = [
   {
@@ -37,18 +38,18 @@ export async function PartnersSection() {
   return (
     <div>
       <SectionHeader title="Hamkorlarimiz" subtitle="Ishonchli ishlab chiqaruvchilar bilan hamkorlikdamiz" />
-      <div className="flex flex-wrap gap-3">
+      <Marquee durationSeconds={manufacturers.length * 4} reverse>
         {manufacturers.map((m) => (
           <div
             key={m.id}
-            className="flex items-center gap-2 rounded-full border bg-card px-4 py-2.5 text-sm font-medium portal-shadow-sm"
+            className="flex shrink-0 items-center gap-2 rounded-full border bg-card px-4 py-2.5 text-sm font-medium portal-shadow-sm"
           >
             <Factory className="h-4 w-4 text-primary/60" />
             {m.name}
             {m.country && <span className="text-muted-foreground">· {m.country}</span>}
           </div>
         ))}
-      </div>
+      </Marquee>
     </div>
   );
 }
@@ -85,9 +86,9 @@ export async function BranchesSection() {
   return (
     <div>
       <SectionHeader title="Filiallarimiz" subtitle="Shahar bo'ylab joylashgan filiallarimiz" href="/locations" />
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <Marquee durationSeconds={branches.length * 6}>
         {branches.map((b) => (
-          <div key={b.id} className="flex flex-col gap-2 rounded-2xl border bg-card p-5 portal-shadow-sm">
+          <div key={b.id} className="flex w-64 shrink-0 flex-col gap-2 rounded-2xl border bg-card p-5 portal-shadow-sm">
             <p className="font-semibold">{b.name}</p>
             <div className="flex items-start gap-2 text-sm text-muted-foreground">
               <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary/60" />
@@ -101,7 +102,7 @@ export async function BranchesSection() {
             )}
           </div>
         ))}
-      </div>
+      </Marquee>
     </div>
   );
 }
