@@ -7,6 +7,7 @@ import { Bell, ShoppingBag } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
@@ -52,7 +53,9 @@ export function StaffNotificationBell() {
         )}
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-80">
-        <DropdownMenuLabel>Bildirishnomalar</DropdownMenuLabel>
+        <DropdownMenuGroup>
+          <DropdownMenuLabel>Bildirishnomalar</DropdownMenuLabel>
+        </DropdownMenuGroup>
         <DropdownMenuSeparator />
         {notifications.length === 0 ? (
           <div className="px-2 py-6 text-center text-sm text-muted-foreground">Hozircha bildirishnoma yo&apos;q</div>
