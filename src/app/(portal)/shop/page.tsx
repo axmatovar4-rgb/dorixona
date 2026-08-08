@@ -8,6 +8,7 @@ import { HealthTips } from "./health-tips";
 import { ShopGrid } from "./shop-grid";
 import { PartnersSection, CertificatesSection, BranchesSection, ContactSection } from "./trust-sections";
 import { PharmaMedSection } from "./pharmamed-section";
+import { StatsSection } from "./stats-section";
 import { getActivePromoMap } from "@/modules/customer/promo-map";
 import { getRatingsMap } from "@/modules/customer/ratings-map";
 
@@ -61,10 +62,19 @@ export default async function ShopHomePage({
   const { search, category } = await searchParams;
   const isSearching = Boolean(search?.trim());
 
-  const categories = await prisma.category.findMany({
-    include: { _count: { select: { products: { where: { isActive: true } } } } },
-    orderBy: { name: "asc" },
-  });
+  const [categories, countriesRaw] = await Promise.all([
+    prisma.category.findMany({
+      include: { _count: { select: { products: { where: { isActive: true } } } } },
+      orderBy: { name: "asc" },
+    }),
+    prisma.manufacturer.findMany({
+      where: { country: { not: null }, products: { some: { isActive: true } } },
+      select: { country: true },
+      distinct: ["country"],
+      orderBy: { country: "asc" },
+    }),
+  ]);
+  const countries = countriesRaw.map((c) => c.country!).filter(Boolean);
 
   if (isSearching) {
     return (
@@ -76,6 +86,7 @@ export default async function ShopHomePage({
         </div>
         <ShopGrid
           categories={categories.map((c) => ({ id: c.id, name: c.name }))}
+          countries={countries}
           initialSearch={search ?? ""}
           initialCategoryId={category ?? ""}
         />
@@ -126,6 +137,10 @@ export default async function ShopHomePage({
   return (
     <div className="flex flex-col gap-16 pb-16 sm:gap-20">
       <Hero />
+
+      <PageContainer>
+        <StatsSection />
+      </PageContainer>
 
       <PageContainer>
         <SectionHeader
@@ -186,6 +201,7 @@ export default async function ShopHomePage({
           <SectionHeader title="Barcha dorilar" subtitle="Katalogni qidiring va filtrlang" />
           <ShopGrid
             categories={categories.map((c) => ({ id: c.id, name: c.name }))}
+            countries={countries}
             initialSearch={search ?? ""}
             initialCategoryId={category ?? ""}
           />

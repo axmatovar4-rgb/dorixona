@@ -5,6 +5,7 @@ import { PortalFooter } from "@/components/portal-footer";
 import { CartProvider } from "@/modules/customer/cart-context";
 import { AIChatProvider } from "@/modules/customer/ai-chat-context";
 import { AIChatSheet } from "@/modules/customer/components/ai-chat-sheet";
+import { ScrollToTopButton } from "@/components/scroll-to-top-button";
 
 export default async function PortalLayout({
   children,
@@ -24,6 +25,7 @@ export default async function PortalLayout({
           <PortalFooter />
         </div>
         <AIChatSheet />
+        <ScrollToTopButton />
       </AIChatProvider>
     </CartProvider>
   );

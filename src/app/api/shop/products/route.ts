@@ -8,6 +8,7 @@ export async function GET(request: NextRequest) {
   const params = request.nextUrl.searchParams;
   const search = params.get("search")?.trim();
   const categoryId = params.get("categoryId");
+  const country = params.get("country");
   const page = Math.max(1, Number(params.get("page") ?? 1));
   const pageSize = Math.min(48, Math.max(1, Number(params.get("pageSize") ?? 12)));
 
@@ -17,6 +18,7 @@ export async function GET(request: NextRequest) {
       ? { name: { contains: search, mode: "insensitive" } }
       : {}),
     ...(categoryId ? { categoryId } : {}),
+    ...(country ? { manufacturer: { country } } : {}),
   };
 
   const [products, total] = await Promise.all([

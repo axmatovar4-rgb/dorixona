@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useQuery } from "@tanstack/react-query";
-import { ChevronLeft, ChevronRight, Search, PackageSearch } from "lucide-react";
+import { ChevronLeft, ChevronRight, Search, PackageSearch, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -28,31 +28,35 @@ const PAGE_SIZE = 12;
 
 export function ShopGrid({
   categories,
+  countries = [],
   initialSearch = "",
   initialCategoryId = "",
 }: {
   categories: Category[];
+  countries?: string[];
   initialSearch?: string;
   initialCategoryId?: string;
 }) {
   const [search, setSearch] = React.useState(initialSearch);
   const [categoryId, setCategoryId] = React.useState(initialCategoryId);
+  const [country, setCountry] = React.useState("");
   const [page, setPage] = React.useState(1);
 
   const debouncedSearch = useDebouncedValue(search, 300);
 
   React.useEffect(() => {
     setPage(1);
-  }, [debouncedSearch, categoryId]);
+  }, [debouncedSearch, categoryId, country]);
 
   const { data, isLoading } = useQuery<ApiResponse>({
-    queryKey: ["shop-products", debouncedSearch, categoryId, page],
+    queryKey: ["shop-products", debouncedSearch, categoryId, country, page],
     queryFn: async () => {
       const qs = new URLSearchParams({
         page: String(page),
         pageSize: String(PAGE_SIZE),
         ...(debouncedSearch ? { search: debouncedSearch } : {}),
         ...(categoryId ? { categoryId } : {}),
+        ...(country ? { country } : {}),
       });
       const res = await fetch(`/api/shop/products?${qs.toString()}`);
       if (!res.ok) throw new Error("Yuklab bo'lmadi");
@@ -60,6 +64,9 @@ export function ShopGrid({
     },
     placeholderData: (prev) => prev,
   });
+
+  const categoryName = categories.find((c) => c.id === categoryId)?.name;
+  const hasActiveFilters = !!search || !!categoryId || !!country;
 
   return (
     <div className="flex flex-col gap-6">
@@ -93,7 +100,70 @@ export function ShopGrid({
             ))}
           </SelectContent>
         </Select>
+        {countries.length > 0 && (
+          <Select
+            items={[{ value: "all", label: "Barcha davlatlar" }, ...countries.map((c) => ({ value: c, label: c }))]}
+            value={country || "all"}
+            onValueChange={(v) => setCountry(!v || v === "all" ? "" : (v as string))}
+          >
+            <SelectTrigger className="h-10 w-52 rounded-full">
+              <SelectValue placeholder="Ishlab chiqarilgan joyi" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Barcha davlatlar</SelectItem>
+              {countries.map((c) => (
+                <SelectItem key={c} value={c}>
+                  {c}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
       </div>
+
+      {hasActiveFilters && (
+        <div className="flex flex-wrap items-center gap-2 text-sm">
+          <span className="text-muted-foreground">Tanlangan filtrlar:</span>
+          {search && (
+            <button
+              type="button"
+              onClick={() => setSearch("")}
+              className="flex items-center gap-1 rounded-full bg-muted px-3 py-1 font-medium hover:bg-muted/70"
+            >
+              &quot;{search}&quot; <X className="h-3 w-3" />
+            </button>
+          )}
+          {categoryId && categoryName && (
+            <button
+              type="button"
+              onClick={() => setCategoryId("")}
+              className="flex items-center gap-1 rounded-full bg-muted px-3 py-1 font-medium hover:bg-muted/70"
+            >
+              {categoryName} <X className="h-3 w-3" />
+            </button>
+          )}
+          {country && (
+            <button
+              type="button"
+              onClick={() => setCountry("")}
+              className="flex items-center gap-1 rounded-full bg-muted px-3 py-1 font-medium hover:bg-muted/70"
+            >
+              {country} <X className="h-3 w-3" />
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={() => {
+              setSearch("");
+              setCategoryId("");
+              setCountry("");
+            }}
+            className="text-primary hover:underline"
+          >
+            Filtrlarni tozalash
+          </button>
+        </div>
+      )}
 
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
         {isLoading
