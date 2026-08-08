@@ -123,16 +123,6 @@ export default async function ShopProductPage({
               </Badge>
             )}
           </div>
-          <div className="grid grid-cols-4 gap-3">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <div
-                key={i}
-                className="flex aspect-square items-center justify-center rounded-2xl border bg-gradient-to-br from-primary/5 to-secondary"
-              >
-                <Pill className="h-6 w-6 text-primary/15" />
-              </div>
-            ))}
-          </div>
         </div>
 
         {/* Info */}

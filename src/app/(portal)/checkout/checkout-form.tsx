@@ -31,10 +31,10 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PageContainer } from "@/modules/customer/components/section";
 import { FakePaymentCard } from "@/modules/customer/components/fake-payment-card";
 import { BranchPicker, type BranchOption } from "@/modules/customer/components/branch-picker";
+import { ZonePicker } from "@/modules/customer/components/zone-picker";
 import { cn } from "@/lib/utils";
 
 type Address = {
@@ -458,21 +458,13 @@ export function CheckoutForm({
           ) : zones.length > 0 ? (
             <div className="flex flex-col gap-1.5 py-1">
               <span className="text-sm text-muted-foreground">Yetkazib berish hududi</span>
-              <div className="flex items-center justify-between gap-2">
-                <Select items={zones.map((z) => ({ value: z.id, label: z.name }))} value={zoneId} onValueChange={(v) => setZoneId(v as string)}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {zones.map((z) => (
-                      <SelectItem key={z.id} value={z.id}>
-                        {z.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <span className="shrink-0 text-sm font-medium">{deliveryFee.toLocaleString("uz-UZ")} so&apos;m</span>
-              </div>
+              <ZonePicker zones={zones} value={zoneId} onChange={setZoneId} />
+              {selectedZone && (
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Tanlandi: {selectedZone.name}</span>
+                  <span className="font-medium">{deliveryFee.toLocaleString("uz-UZ")} so&apos;m</span>
+                </div>
+              )}
             </div>
           ) : (
             <div className="flex justify-between text-sm">
