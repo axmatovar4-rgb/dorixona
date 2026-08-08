@@ -139,10 +139,6 @@ export default async function ShopHomePage({
       <Hero />
 
       <PageContainer>
-        <StatsSection />
-      </PageContainer>
-
-      <PageContainer>
         <SectionHeader
           title="Tavsiya etilgan dorilar"
           subtitle="Siz uchun tanlangan sifatli mahsulotlar"
@@ -206,6 +202,10 @@ export default async function ShopHomePage({
             initialCategoryId={category ?? ""}
           />
         </div>
+      </PageContainer>
+
+      <PageContainer>
+        <StatsSection />
       </PageContainer>
     </div>
   );
