@@ -15,6 +15,8 @@ import {
   Percent,
   Stethoscope,
   CalendarCheck,
+  MapPinned,
+  KeyRound,
   type LucideIcon,
 } from "lucide-react";
 
@@ -55,6 +57,8 @@ export const NAV_ITEMS: NavItem[] = [
   { title: "Aksiya kodlari", href: "/promo-codes", icon: Percent },
   { title: "Shifokorlar", href: "/doctors", icon: Stethoscope },
   { title: "Qabullar", href: "/appointments", icon: CalendarCheck },
+  { title: "Yetkazib berish hududlari", href: "/delivery-zones", icon: MapPinned },
+  { title: "Foydalanuvchilar", href: "/users", icon: KeyRound },
   {
     title: "Sotuvlar",
     icon: ScanBarcode,

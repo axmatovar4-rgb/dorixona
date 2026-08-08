@@ -15,6 +15,7 @@ import {
 } from "@/lib/order-labels";
 import { cn } from "@/lib/utils";
 import { ReorderButton } from "@/modules/customer/components/reorder-button";
+import { CancelOrderButton } from "@/modules/customer/components/cancel-order-button";
 
 export const metadata: Metadata = { title: "Buyurtma tafsilotlari" };
 
@@ -112,7 +113,9 @@ export default async function OrderDetailPage({
             </div>
           )}
           <div className="flex justify-between">
-            <span className="text-muted-foreground">Yetkazib berish</span>
+            <span className="text-muted-foreground">
+              Yetkazib berish{order.deliveryZoneName ? ` (${order.deliveryZoneName})` : ""}
+            </span>
             <span>{Number(order.deliveryFee).toLocaleString("uz-UZ")} so&apos;m</span>
           </div>
           <Separator className="my-1" />
@@ -151,6 +154,26 @@ export default async function OrderDetailPage({
           <Badge variant={order.prescriptionImageUrl ? "secondary" : "destructive"}>
             {order.prescriptionImageUrl ? "Yuklangan · Tekshirilmoqda" : "Yuklanmagan"}
           </Badge>
+        </div>
+      )}
+
+      {!isCancelled && (
+        <div className="rounded-2xl border bg-card p-5 portal-shadow-sm">
+          <h2 className="mb-2 text-sm font-semibold text-muted-foreground">Bekor qilish / Qaytarish</h2>
+          {order.returnStatus === "PENDING" ? (
+            <p className="text-sm text-muted-foreground">
+              So&apos;rovingiz yuborilgan — sabab: &quot;{order.returnReason}&quot;. Ko&apos;rib chiqilmoqda.
+            </p>
+          ) : order.returnStatus === "REJECTED" ? (
+            <div className="flex flex-col gap-2 text-sm">
+              <p className="text-muted-foreground">
+                Oldingi so&apos;rovingiz rad etildi{order.returnNote ? `: "${order.returnNote}"` : "."}
+              </p>
+              <CancelOrderButton orderId={order.id} />
+            </div>
+          ) : (
+            <CancelOrderButton orderId={order.id} />
+          )}
         </div>
       )}
     </PageContainer>

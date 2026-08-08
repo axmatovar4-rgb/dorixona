@@ -8,10 +8,13 @@ export const metadata: Metadata = { title: "Buyurtmani rasmiylashtirish" };
 
 export default async function CheckoutPage() {
   const session = await auth();
-  const addresses = await prisma.address.findMany({
-    where: { customerId: session!.user.id },
-    orderBy: [{ isDefault: "desc" }, { createdAt: "desc" }],
-  });
+  const [addresses, zonesRaw] = await Promise.all([
+    prisma.address.findMany({
+      where: { customerId: session!.user.id },
+      orderBy: [{ isDefault: "desc" }, { createdAt: "desc" }],
+    }),
+    prisma.deliveryZone.findMany({ where: { isActive: true }, orderBy: { sortOrder: "asc" } }),
+  ]);
 
   return (
     <PageContainer className="flex flex-col gap-6 py-8 sm:py-12">
@@ -23,6 +26,7 @@ export default async function CheckoutPage() {
           fullAddress: a.fullAddress,
           isDefault: a.isDefault,
         }))}
+        zones={zonesRaw.map((z) => ({ id: z.id, name: z.name, fee: Number(z.fee), isDefault: z.isDefault }))}
       />
     </PageContainer>
   );

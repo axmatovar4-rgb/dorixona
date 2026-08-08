@@ -19,6 +19,7 @@ import {
 import { DELIVERY_FEE } from "@/modules/customer/constants";
 import { listNotifications, getUnreadCount, markAllRead } from "@/lib/notifications";
 import { notifyRoles } from "@/lib/staff-notifications";
+import { sendTelegramMessage } from "@/lib/telegram";
 
 export async function registerCustomer(input: RegisterInput) {
   const parsed = registerSchema.safeParse(input);
@@ -163,7 +164,7 @@ export async function createOrder(input: CheckoutInput) {
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "Ma'lumotlar noto'g'ri" };
   }
-  const { addressId, paymentMethod, courierNote, promoCode, items } = parsed.data;
+  const { addressId, paymentMethod, courierNote, promoCode, deliveryZoneId, items } = parsed.data;
 
   const address = await prisma.address.findUnique({ where: { id: addressId } });
   if (!address || address.customerId !== session.user.id) {
@@ -210,7 +211,16 @@ export async function createOrder(input: CheckoutInput) {
     discountAmount = Math.round((eligibleSubtotal * found.discountPercent) / 100);
     appliedCode = found.code;
   }
-  const total = subtotal - discountAmount + DELIVERY_FEE;
+  let deliveryFee: number = DELIVERY_FEE;
+  let deliveryZoneName: string | null = null;
+  if (deliveryZoneId) {
+    const zone = await prisma.deliveryZone.findUnique({ where: { id: deliveryZoneId } });
+    if (zone && zone.isActive) {
+      deliveryFee = Number(zone.fee);
+      deliveryZoneName = zone.name;
+    }
+  }
+  const total = subtotal - discountAmount + deliveryFee;
 
   let orderId: string;
   try {
@@ -221,12 +231,13 @@ export async function createOrder(input: CheckoutInput) {
           addressId,
           paymentMethod,
           subtotal,
-          deliveryFee: DELIVERY_FEE,
+          deliveryFee,
           total,
           requiresPrescription,
           courierNote: courierNote || null,
           discountCode: appliedCode,
           discountAmount,
+          deliveryZoneName,
           items: { create: orderItems },
         },
         include: { items: true },
@@ -344,6 +355,59 @@ export async function unlinkTelegram() {
   return { success: true as const };
 }
 
+// ---------- Password reset (via Telegram) ----------
+
+export async function requestPasswordReset(phone: string) {
+  const customer = await prisma.customer.findUnique({ where: { phone: phone.trim() } });
+  if (!customer) {
+    return { error: "Bu telefon raqami ro'yxatdan o'tmagan" };
+  }
+  if (!customer.telegramChatId) {
+    return {
+      error:
+        "Bu hisob Telegram'ga bog'lanmagan. Iltimos, profil sahifasidan Telegram bog'lang yoki administratorga murojaat qiling.",
+    };
+  }
+
+  const code = String(Math.floor(100000 + Math.random() * 900000));
+  const resetCodeHash = await bcrypt.hash(code, 10);
+  await prisma.customer.update({
+    where: { id: customer.id },
+    data: { resetCodeHash, resetCodeExpiresAt: new Date(Date.now() + 10 * 60 * 1000) },
+  });
+
+  await sendTelegramMessage(
+    customer.telegramChatId,
+    `PharmCare: parolni tiklash kodi — ${code}\n\nKod 10 daqiqa amal qiladi. Agar bu so'rovni siz yubormagan bo'lsangiz, e'tiborsiz qoldiring.`
+  );
+
+  return { success: true as const };
+}
+
+export async function confirmPasswordReset(phone: string, code: string, newPassword: string) {
+  if (newPassword.length < 6) {
+    return { error: "Parol kamida 6 ta belgidan iborat bo'lishi kerak" };
+  }
+  const customer = await prisma.customer.findUnique({ where: { phone: phone.trim() } });
+  if (!customer || !customer.resetCodeHash || !customer.resetCodeExpiresAt) {
+    return { error: "Avval kod so'rang" };
+  }
+  if (customer.resetCodeExpiresAt.getTime() < Date.now()) {
+    return { error: "Kodning muddati tugagan, qaytadan so'rang" };
+  }
+  const valid = await bcrypt.compare(code.trim(), customer.resetCodeHash);
+  if (!valid) {
+    return { error: "Kod noto'g'ri" };
+  }
+
+  const passwordHash = await bcrypt.hash(newPassword, 10);
+  await prisma.customer.update({
+    where: { id: customer.id },
+    data: { passwordHash, resetCodeHash: null, resetCodeExpiresAt: null },
+  });
+  return { success: true as const };
+}
+
 // ---------- Stock alerts ----------
 
 export async function subscribeToStockAlert(productId: string) {
@@ -401,4 +465,42 @@ export async function reorderItems(orderId: string) {
   }
 
   return { success: true as const, items, skipped };
+}
+
+// ---------- Order cancellation / return ----------
+
+export async function requestOrderCancellation(orderId: string, reason: string) {
+  const session = await auth();
+  if (!session?.user || session.user.type !== "CUSTOMER") {
+    return { error: "Sizda ruxsat yo'q" };
+  }
+  const trimmedReason = reason.trim();
+  if (trimmedReason.length < 3) {
+    return { error: "Sababni qisqacha yozing" };
+  }
+
+  const order = await prisma.order.findUnique({ where: { id: orderId } });
+  if (!order || order.customerId !== session.user.id) {
+    return { error: "Buyurtma topilmadi" };
+  }
+  if (order.status === "CANCELLED") {
+    return { error: "Bu buyurtma allaqachon bekor qilingan" };
+  }
+  if (order.returnStatus === "PENDING") {
+    return { error: "So'rov allaqachon yuborilgan, ko'rib chiqilmoqda" };
+  }
+
+  await prisma.order.update({
+    where: { id: orderId },
+    data: { returnStatus: "PENDING", returnReason: trimmedReason, returnNote: null },
+  });
+
+  await notifyRoles(["CASHIER", "MANAGER", "SUPER_ADMIN"], {
+    type: "NEW_ORDER",
+    title: "Bekor qilish so'rovi",
+    body: `#${orderId.slice(-8).toUpperCase()} uchun mijoz bekor qilish/qaytarish so'radi`,
+  });
+
+  revalidatePath(`/orders/${orderId}`);
+  return { success: true as const };
 }

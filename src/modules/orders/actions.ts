@@ -28,6 +28,33 @@ export async function updateOrderStatus(orderId: string, status: OrderStatus) {
   return { success: true as const };
 }
 
+export async function resolveReturnRequest(orderId: string, approve: boolean, note: string) {
+  const session = await auth();
+  if (!session?.user || session.user.type !== "STAFF" || !can(session.user.role, "sales", "edit")) {
+    return { error: "Sizda ruxsat yo'q" };
+  }
+
+  await prisma.order.update({
+    where: { id: orderId },
+    data: {
+      returnStatus: approve ? "APPROVED" : "REJECTED",
+      returnNote: note.trim() || null,
+      ...(approve ? { status: "CANCELLED" as OrderStatus } : {}),
+    },
+  });
+
+  await logAudit({
+    userId: session.user.id,
+    action: approve ? "APPROVE_RETURN" : "REJECT_RETURN",
+    entityType: "Order",
+    entityId: orderId,
+  });
+
+  revalidatePath("/sales/orders");
+  revalidatePath(`/sales/orders/${orderId}`);
+  return { success: true as const };
+}
+
 export async function updatePaymentStatus(orderId: string, paymentStatus: PaymentStatus) {
   const session = await auth();
   if (!session?.user || session.user.type !== "STAFF" || !can(session.user.role, "sales", "edit")) {

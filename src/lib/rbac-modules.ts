@@ -17,6 +17,7 @@ export const NEW_MODULES = [
   "audit",
   "promoCodes",
   "doctors",
+  "deliveryZones",
 ] as const;
 
 export type NewModuleName = (typeof NEW_MODULES)[number];
@@ -36,6 +37,7 @@ export const NEW_MODULE_LABELS: Record<NewModuleName, string> = {
   audit: "Audit",
   promoCodes: "Aksiya kodlari",
   doctors: "Shifokorlar",
+  deliveryZones: "Yetkazib berish hududlari",
 };
 
 export async function canAsync(

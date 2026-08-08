@@ -29,6 +29,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PageContainer } from "@/modules/customer/components/section";
 import { FakePaymentCard } from "@/modules/customer/components/fake-payment-card";
 import { cn } from "@/lib/utils";
@@ -39,6 +40,8 @@ type Address = {
   fullAddress: string;
   isDefault: boolean;
 };
+
+type Zone = { id: string; name: string; fee: number; isDefault: boolean };
 
 const PAYMENT_OPTIONS: {
   value: (typeof PAYMENT_METHODS)[number];
@@ -53,13 +56,18 @@ const PAYMENT_OPTIONS: {
   { value: "VISA", label: "Visa", logo: VisaLogo },
 ];
 
-export function CheckoutForm({ addresses }: { addresses: Address[] }) {
+export function CheckoutForm({ addresses, zones }: { addresses: Address[]; zones: Zone[] }) {
   const router = useRouter();
   const { items, subtotal, clear } = useCart();
 
   const [addressId, setAddressId] = React.useState(
     addresses.find((a) => a.isDefault)?.id ?? addresses[0]?.id ?? ""
   );
+  const [zoneId, setZoneId] = React.useState(
+    zones.find((z) => z.isDefault)?.id ?? zones[0]?.id ?? ""
+  );
+  const selectedZone = zones.find((z) => z.id === zoneId);
+  const deliveryFee = selectedZone ? selectedZone.fee : DELIVERY_FEE;
   const [showNewAddress, setShowNewAddress] = React.useState(addresses.length === 0);
   const [newAddress, setNewAddress] = React.useState("");
   const [savingAddress, setSavingAddress] = React.useState(false);
@@ -106,7 +114,7 @@ export function CheckoutForm({ addresses }: { addresses: Address[] }) {
       : subtotal
     : 0;
   const discountAmount = appliedPromo ? Math.round((promoEligibleSubtotal * appliedPromo.discountPercent) / 100) : 0;
-  const total = subtotal - discountAmount + DELIVERY_FEE;
+  const total = subtotal - discountAmount + deliveryFee;
   const isOnlinePayment = paymentMethod !== "CASH_ON_DELIVERY";
   const canSubmit = !isOnlinePayment || onlinePaymentValid;
 
@@ -164,6 +172,7 @@ export function CheckoutForm({ addresses }: { addresses: Address[] }) {
       paymentMethod,
       courierNote: courierNote.trim(),
       promoCode: appliedPromo?.code ?? "",
+      deliveryZoneId: zoneId || "",
       items: items.map((i) => ({ productId: i.productId, quantity: i.quantity })),
     });
     setSubmitting(false);
@@ -390,10 +399,31 @@ export function CheckoutForm({ addresses }: { addresses: Address[] }) {
               <span>-{discountAmount.toLocaleString("uz-UZ")} so&apos;m</span>
             </div>
           )}
-          <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">Yetkazib berish</span>
-            <span>{DELIVERY_FEE.toLocaleString("uz-UZ")} so&apos;m</span>
-          </div>
+          {zones.length > 0 ? (
+            <div className="flex flex-col gap-1.5 py-1">
+              <span className="text-sm text-muted-foreground">Yetkazib berish hududi</span>
+              <div className="flex items-center justify-between gap-2">
+                <Select items={zones.map((z) => ({ value: z.id, label: z.name }))} value={zoneId} onValueChange={(v) => setZoneId(v as string)}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {zones.map((z) => (
+                      <SelectItem key={z.id} value={z.id}>
+                        {z.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <span className="shrink-0 text-sm font-medium">{deliveryFee.toLocaleString("uz-UZ")} so&apos;m</span>
+              </div>
+            </div>
+          ) : (
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">Yetkazib berish</span>
+              <span>{deliveryFee.toLocaleString("uz-UZ")} so&apos;m</span>
+            </div>
+          )}
           <Separator className="my-1" />
           <div className="flex justify-between text-lg font-bold">
             <span>Jami</span>

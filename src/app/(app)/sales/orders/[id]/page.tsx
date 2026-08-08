@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/table";
 import { PAYMENT_METHOD_LABELS } from "@/lib/order-labels";
 import { StatusControl } from "./status-control";
+import { ReturnRequestPanel } from "./return-request-panel";
 
 export const metadata: Metadata = { title: "Buyurtma tafsilotlari" };
 
@@ -125,7 +126,9 @@ export default async function StaffOrderDetailPage({
               </div>
             )}
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Yetkazib berish</span>
+              <span className="text-muted-foreground">
+                Yetkazib berish{order.deliveryZoneName ? ` (${order.deliveryZoneName})` : ""}
+              </span>
               <span>{Number(order.deliveryFee).toLocaleString("uz-UZ")} so&apos;m</span>
             </div>
             <div className="flex justify-between font-semibold">
@@ -135,6 +138,23 @@ export default async function StaffOrderDetailPage({
           </div>
         </CardContent>
       </Card>
+
+      {order.returnStatus && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Bekor qilish / Qaytarish so&apos;rovi</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ReturnRequestPanel
+              orderId={order.id}
+              returnStatus={order.returnStatus}
+              returnReason={order.returnReason}
+              returnNote={order.returnNote}
+              canEdit={can(session.user.role, "sales", "edit")}
+            />
+          </CardContent>
+        </Card>
+      )}
 
       {order.requiresPrescription && (
         <Card>

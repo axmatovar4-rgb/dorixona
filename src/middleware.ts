@@ -5,6 +5,6 @@ export const { auth: middleware } = NextAuth(authConfig);
 
 export const config = {
   matcher: [
-    "/((?!login|register|api/auth|api/telegram|api/cron|api/shop|_next/static|_next/image|favicon.ico).*)",
+    "/((?!login|register|forgot-password|api/auth|api/telegram|api/cron|api/shop|_next/static|_next/image|favicon.ico).*)",
   ],
 };
