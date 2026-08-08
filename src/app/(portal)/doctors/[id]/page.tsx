@@ -54,9 +54,7 @@ export default async function DoctorProfilePage({
           </div>
           <div>
             <h1 className="text-xl font-bold tracking-tight">{doctor.fullName}</h1>
-            <p className="text-muted-foreground">
-              {specialtyInfo?.emoji} {doctor.specialty}
-            </p>
+            <p className="text-muted-foreground">{doctor.specialty}</p>
             {specialtyInfo && <p className="mt-1 text-xs text-muted-foreground/80">{specialtyInfo.description}</p>}
           </div>
           <div className="grid w-full grid-cols-1 gap-2 text-left text-sm">

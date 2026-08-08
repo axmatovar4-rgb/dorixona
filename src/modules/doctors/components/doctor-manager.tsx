@@ -163,7 +163,7 @@ export function DoctorManager({ doctors, canManage }: { doctors: Doctor[]; canMa
             <div className="flex flex-col gap-1.5">
               <label className="text-sm font-medium">Mutaxassisligi</label>
               <Select
-                items={SPECIALTIES.map((s) => ({ value: s.label, label: `${s.emoji} ${s.label}` }))}
+                items={SPECIALTIES.map((s) => ({ value: s.label, label: s.label }))}
                 value={form.specialty}
                 onValueChange={(v) => setForm((f) => ({ ...f, specialty: v as string }))}
               >
@@ -173,7 +173,7 @@ export function DoctorManager({ doctors, canManage }: { doctors: Doctor[]; canMa
                 <SelectContent>
                   {SPECIALTIES.map((s) => (
                     <SelectItem key={s.label} value={s.label}>
-                      {s.emoji} {s.label}
+                      {s.label}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -234,9 +234,7 @@ export function DoctorManager({ doctors, canManage }: { doctors: Doctor[]; canMa
             doctors.map((doc) => (
               <TableRow key={doc.id}>
                 <TableCell className="font-medium">{doc.fullName}</TableCell>
-                <TableCell>
-                  {SPECIALTIES.find((s) => s.label === doc.specialty)?.emoji} {doc.specialty}
-                </TableCell>
+                <TableCell>{doc.specialty}</TableCell>
                 <TableCell>{doc.age}</TableCell>
                 <TableCell className="max-w-48 text-sm text-muted-foreground">
                   {doc.workDays.map((d) => WEEKDAY_LABELS[d].slice(0, 3)).join(", ")}
@@ -310,7 +308,7 @@ export function DoctorManager({ doctors, canManage }: { doctors: Doctor[]; canMa
               <div className="flex flex-col gap-1.5">
                 <Label>Mutaxassisligi</Label>
                 <Select
-                  items={SPECIALTIES.map((s) => ({ value: s.label, label: `${s.emoji} ${s.label}` }))}
+                  items={SPECIALTIES.map((s) => ({ value: s.label, label: s.label }))}
                   value={editForm.specialty}
                   onValueChange={(v) => setEditForm((f) => ({ ...f, specialty: v as string }))}
                 >
@@ -320,7 +318,7 @@ export function DoctorManager({ doctors, canManage }: { doctors: Doctor[]; canMa
                   <SelectContent>
                     {SPECIALTIES.map((s) => (
                       <SelectItem key={s.label} value={s.label}>
-                        {s.emoji} {s.label}
+                        {s.label}
                       </SelectItem>
                     ))}
                   </SelectContent>
