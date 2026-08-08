@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Stethoscope, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { getSpecialtyInfo } from "@/lib/specialties";
 
 export type DoctorCardData = {
   id: string;
@@ -10,6 +11,7 @@ export type DoctorCardData = {
 };
 
 export function DoctorCard({ doctor }: { doctor: DoctorCardData }) {
+  const specialtyEmoji = getSpecialtyInfo(doctor.specialty)?.emoji;
   return (
     <div className="flex flex-col items-center gap-3 rounded-2xl border bg-card p-5 text-center portal-shadow-sm transition-all duration-300 hover:-translate-y-1 hover:portal-shadow">
       <div className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-primary/10 via-accent to-secondary">
@@ -22,7 +24,9 @@ export function DoctorCard({ doctor }: { doctor: DoctorCardData }) {
       </div>
       <div>
         <p className="font-semibold leading-tight">{doctor.fullName}</p>
-        <p className="text-sm text-muted-foreground">{doctor.specialty}</p>
+        <p className="text-sm text-muted-foreground">
+          {specialtyEmoji} {doctor.specialty}
+        </p>
       </div>
       <Button variant="outline" size="sm" className="gap-1.5 rounded-full" render={<Link href={`/doctors/${doctor.id}`} />}>
         <Eye className="h-3.5 w-3.5" />

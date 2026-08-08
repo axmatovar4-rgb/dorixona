@@ -28,7 +28,9 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { WEEKDAY_LABELS, WEEKDAY_ORDER } from "@/lib/weekday-labels";
+import { SPECIALTIES } from "@/lib/specialties";
 import { WEEKDAYS } from "@/modules/doctors/schemas";
 import { createDoctor, updateDoctor, toggleDoctorActive, deleteDoctor } from "@/modules/doctors/actions";
 
@@ -160,7 +162,22 @@ export function DoctorManager({ doctors, canManage }: { doctors: Doctor[]; canMa
             </div>
             <div className="flex flex-col gap-1.5">
               <label className="text-sm font-medium">Mutaxassisligi</label>
-              <Input value={form.specialty} onChange={(e) => setForm((f) => ({ ...f, specialty: e.target.value }))} placeholder="Terapevt" required className="w-40" />
+              <Select
+                items={SPECIALTIES.map((s) => ({ value: s.label, label: `${s.emoji} ${s.label}` }))}
+                value={form.specialty}
+                onValueChange={(v) => setForm((f) => ({ ...f, specialty: v as string }))}
+              >
+                <SelectTrigger className="w-44">
+                  <SelectValue placeholder="Tanlang" />
+                </SelectTrigger>
+                <SelectContent>
+                  {SPECIALTIES.map((s) => (
+                    <SelectItem key={s.label} value={s.label}>
+                      {s.emoji} {s.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="flex flex-col gap-1.5">
               <label className="text-sm font-medium">Yoshi</label>
@@ -217,7 +234,9 @@ export function DoctorManager({ doctors, canManage }: { doctors: Doctor[]; canMa
             doctors.map((doc) => (
               <TableRow key={doc.id}>
                 <TableCell className="font-medium">{doc.fullName}</TableCell>
-                <TableCell>{doc.specialty}</TableCell>
+                <TableCell>
+                  {SPECIALTIES.find((s) => s.label === doc.specialty)?.emoji} {doc.specialty}
+                </TableCell>
                 <TableCell>{doc.age}</TableCell>
                 <TableCell className="max-w-48 text-sm text-muted-foreground">
                   {doc.workDays.map((d) => WEEKDAY_LABELS[d].slice(0, 3)).join(", ")}
@@ -290,7 +309,22 @@ export function DoctorManager({ doctors, canManage }: { doctors: Doctor[]; canMa
               </div>
               <div className="flex flex-col gap-1.5">
                 <Label>Mutaxassisligi</Label>
-                <Input value={editForm.specialty} onChange={(e) => setEditForm((f) => ({ ...f, specialty: e.target.value }))} />
+                <Select
+                  items={SPECIALTIES.map((s) => ({ value: s.label, label: `${s.emoji} ${s.label}` }))}
+                  value={editForm.specialty}
+                  onValueChange={(v) => setEditForm((f) => ({ ...f, specialty: v as string }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Tanlang" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {SPECIALTIES.map((s) => (
+                      <SelectItem key={s.label} value={s.label}>
+                        {s.emoji} {s.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="flex flex-col gap-1.5">
                 <Label>Yoshi</Label>

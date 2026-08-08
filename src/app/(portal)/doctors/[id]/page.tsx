@@ -7,6 +7,7 @@ import { prisma } from "@/lib/prisma";
 import { PageContainer } from "@/modules/customer/components/section";
 import { BookAppointmentForm } from "@/modules/customer/components/book-appointment-form";
 import { WEEKDAY_LABELS } from "@/lib/weekday-labels";
+import { getSpecialtyInfo } from "@/lib/specialties";
 
 export async function generateMetadata({
   params,
@@ -29,6 +30,7 @@ export default async function DoctorProfilePage({
     prisma.doctor.findUnique({ where: { id } }),
   ]);
   if (!doctor || !doctor.isActive) notFound();
+  const specialtyInfo = getSpecialtyInfo(doctor.specialty);
 
   return (
     <PageContainer className="flex flex-col gap-8 py-8 sm:py-12">
@@ -52,7 +54,10 @@ export default async function DoctorProfilePage({
           </div>
           <div>
             <h1 className="text-xl font-bold tracking-tight">{doctor.fullName}</h1>
-            <p className="text-muted-foreground">{doctor.specialty}</p>
+            <p className="text-muted-foreground">
+              {specialtyInfo?.emoji} {doctor.specialty}
+            </p>
+            {specialtyInfo && <p className="mt-1 text-xs text-muted-foreground/80">{specialtyInfo.description}</p>}
           </div>
           <div className="grid w-full grid-cols-1 gap-2 text-left text-sm">
             <div className="flex items-center gap-2 rounded-xl bg-muted/50 p-3">
