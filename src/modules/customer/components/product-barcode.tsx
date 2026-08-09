@@ -22,7 +22,8 @@ export function ProductBarcode({ value }: { value: string }) {
     <div className="mx-auto flex w-fit flex-col items-center gap-1.5 rounded-xl border bg-white p-3 dark:bg-white">
       <svg ref={svgRef} />
       <span className="text-[11px] text-neutral-500">
-        POS kamerasi uchun — yorug&apos;lik yetarli joyda, ekrandan 10&ndash;15 sm masofada ushlang
+        POS kamerasi uchun — bu ekranni kameraga <strong>tik va tekis</strong> (qiyalatmasdan) tuting, 10&ndash;15 sm
+        masofada, yorug&apos;lik yetarli joyda, ekranga aks tushmasin
       </span>
     </div>
   );

@@ -121,9 +121,16 @@ export function PosTerminal() {
         ]);
         hints.set(DecodeHintType.TRY_HARDER, true);
         const reader = new BrowserMultiFormatReader(hints);
+        const constraints: MediaStreamConstraints = {
+          video: {
+            facingMode: { ideal: "environment" },
+            width: { ideal: 1920 },
+            height: { ideal: 1080 },
+          },
+        };
 
         reader
-          .decodeFromVideoDevice(undefined, videoRef.current, (result) => {
+          .decodeFromConstraints(constraints, videoRef.current, (result) => {
             if (!result) return;
             const code = result.getText();
             const now = Date.now();
@@ -213,8 +220,17 @@ export function PosTerminal() {
           </div>
 
           {scanning && (
-            <div className="mb-3 overflow-hidden rounded-xl border bg-black">
-              <video ref={videoRef} className="aspect-video w-full object-cover" muted playsInline />
+            <div className="mb-3 flex flex-col gap-2">
+              <div className="relative overflow-hidden rounded-xl border bg-black">
+                <video ref={videoRef} className="aspect-video w-full object-cover" muted playsInline />
+                <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+                  <div className="h-16 w-[85%] max-w-md rounded-lg border-2 border-primary/80 shadow-[0_0_0_9999px_rgba(0,0,0,0.35)]" />
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Shtrix-kodni <strong>tekis va qiyalatmasdan</strong>, yuqoridagi ramka ichiga to&apos;g&apos;ri
+                joylashtiring. Ekranni yaltiratmang, yorug&apos;lik yetarli bo&apos;lsin.
+              </p>
             </div>
           )}
           {cameraError && (
