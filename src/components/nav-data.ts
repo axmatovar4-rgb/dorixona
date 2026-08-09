@@ -64,7 +64,10 @@ export const NAV_ITEMS: NavItem[] = [
   {
     title: "Sotuvlar",
     icon: ScanBarcode,
-    children: [{ title: "Buyurtmalar", href: "/sales/orders" }],
+    children: [
+      { title: "Kassa (POS)", href: "/pos" },
+      { title: "Buyurtmalar", href: "/sales/orders" },
+    ],
   },
   { title: "Xodimlar", href: "/hr", icon: UserCog },
   { title: "Ish haqi", href: "/payroll", icon: Banknote },

@@ -146,6 +146,7 @@ model User {
   invoices        Invoice[]
   customerNotes   CustomerNote[]
   staffNotifications StaffNotification[]
+  posSales        PosSale[]
 }
 
 model Customer {
@@ -358,6 +359,7 @@ model Branch {
   warehouses Warehouse[]
   users      User[]
   pickupOrders Order[]   @relation("OrderPickupBranch")
+  posSales     PosSale[]
 }
 
 model Warehouse {
@@ -448,8 +450,43 @@ model Product {
   purchaseOrderItems PurchaseOrderItem[]
   promoCodes    PromoCode[]
   reviews       Review[]
+  posSaleItems  PosSaleItem[]
 
   @@index([name])
+}
+
+enum PosPaymentMethod {
+  CASH
+  CARD
+}
+
+model PosSale {
+  id             String           @id @default(cuid())
+  cashierId      String
+  cashier        User             @relation(fields: [cashierId], references: [id])
+  branchId       String?
+  branch         Branch?          @relation(fields: [branchId], references: [id])
+  subtotal       Decimal          @db.Decimal(12, 2)
+  discountAmount Decimal          @db.Decimal(12, 2) @default(0)
+  total          Decimal          @db.Decimal(12, 2)
+  paymentMethod  PosPaymentMethod @default(CASH)
+  createdAt      DateTime         @default(now())
+
+  items PosSaleItem[]
+
+  @@index([cashierId])
+  @@index([createdAt])
+}
+
+model PosSaleItem {
+  id        String  @id @default(cuid())
+  saleId    String
+  sale      PosSale @relation(fields: [saleId], references: [id])
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+  quantity  Int
+  unitPrice Decimal @db.Decimal(12, 2)
+  lineTotal Decimal @db.Decimal(12, 2)
 }
 
 model Review {
