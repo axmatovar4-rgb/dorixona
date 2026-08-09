@@ -11,7 +11,7 @@ export function StickyAddToCart(props: {
   inStock: boolean;
 }) {
   return (
-    <div className="fixed inset-x-0 bottom-0 z-30 border-t bg-background/95 p-3 backdrop-blur-md sm:hidden">
+    <div className="fixed inset-x-0 bottom-0 z-30 border-t bg-background p-3 sm:hidden">
       <div className="mx-auto flex max-w-7xl items-center gap-3 px-1">
         <div className="flex-1">
           <p className="text-lg font-bold">
