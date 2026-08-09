@@ -139,11 +139,6 @@ export default async function ShopHomePage({
       <Hero />
 
       <PageContainer>
-        <SectionHeader
-          title="Tavsiya etilgan dorilar"
-          subtitle="Siz uchun tanlangan sifatli mahsulotlar"
-          href="/shop#catalog"
-        />
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
           {featured.map((p) => (
             <MedicineCard key={p.id} product={p} />
