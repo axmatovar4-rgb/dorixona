@@ -109,31 +109,42 @@ export function PosTerminal() {
     let cancelled = false;
     setCameraError(null);
 
-    import("@zxing/browser").then(({ BrowserMultiFormatReader }) => {
-      if (cancelled || !videoRef.current) return;
-      const reader = new BrowserMultiFormatReader();
-      reader
-        .decodeFromVideoDevice(undefined, videoRef.current, (result) => {
-          if (!result) return;
-          const code = result.getText();
-          const now = Date.now();
-          if (code === lastScanRef.current.code && now - lastScanRef.current.at < 2500) return;
-          lastScanRef.current = { code, at: now };
-          void handleBarcode(code);
-        })
-        .then((controls) => {
-          if (cancelled) {
-            controls.stop();
-            return;
-          }
-          controlsRef.current = controls;
-        })
-        .catch((err) => {
-          if (cancelled) return;
-          setCameraError(err instanceof Error ? err.message : "Kamerani ochib bo'lmadi");
-          setScanning(false);
-        });
-    });
+    Promise.all([import("@zxing/browser"), import("@zxing/library")]).then(
+      ([{ BrowserMultiFormatReader }, { DecodeHintType, BarcodeFormat }]) => {
+        if (cancelled || !videoRef.current) return;
+
+        const hints = new Map();
+        hints.set(DecodeHintType.POSSIBLE_FORMATS, [
+          BarcodeFormat.CODE_128,
+          BarcodeFormat.EAN_13,
+          BarcodeFormat.EAN_8,
+        ]);
+        hints.set(DecodeHintType.TRY_HARDER, true);
+        const reader = new BrowserMultiFormatReader(hints);
+
+        reader
+          .decodeFromVideoDevice(undefined, videoRef.current, (result) => {
+            if (!result) return;
+            const code = result.getText();
+            const now = Date.now();
+            if (code === lastScanRef.current.code && now - lastScanRef.current.at < 2500) return;
+            lastScanRef.current = { code, at: now };
+            void handleBarcode(code);
+          })
+          .then((controls) => {
+            if (cancelled) {
+              controls.stop();
+              return;
+            }
+            controlsRef.current = controls;
+          })
+          .catch((err) => {
+            if (cancelled) return;
+            setCameraError(err instanceof Error ? err.message : "Kamerani ochib bo'lmadi");
+            setScanning(false);
+          });
+      }
+    );
 
     return () => {
       cancelled = true;
