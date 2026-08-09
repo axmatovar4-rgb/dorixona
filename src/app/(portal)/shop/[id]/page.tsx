@@ -23,6 +23,7 @@ import { getFrequentlyBoughtWith } from "@/modules/customer/recommendations";
 import { getActivePromoMap } from "@/modules/customer/promo-map";
 import { getRatingsMap } from "@/modules/customer/ratings-map";
 import { ProductReviews } from "@/modules/reviews/components/product-reviews";
+import { ProductBarcode } from "@/modules/customer/components/product-barcode";
 import { auth } from "@/lib/auth";
 import { StickyAddToCart } from "./sticky-add-to-cart";
 
@@ -144,6 +145,7 @@ export default async function ShopProductPage({
               </Badge>
             )}
           </div>
+          <ProductBarcode value={product.barcode} />
         </div>
 
         {/* Info */}
