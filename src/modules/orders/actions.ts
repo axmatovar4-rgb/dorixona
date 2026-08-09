@@ -13,6 +13,16 @@ export async function updateOrderStatus(orderId: string, status: OrderStatus) {
     return { error: "Sizda ruxsat yo'q" };
   }
 
+  if (status !== "PENDING" && status !== "CANCELLED") {
+    const order = await prisma.order.findUnique({
+      where: { id: orderId },
+      select: { requiresPrescription: true, prescriptionImageUrl: true },
+    });
+    if (order?.requiresPrescription && !order.prescriptionImageUrl) {
+      return { error: "Retsept rasmi hali yuklanmagan — buyurtmani tayyorlashga o'tkazib bo'lmaydi" };
+    }
+  }
+
   await prisma.order.update({ where: { id: orderId }, data: { status } });
 
   await logAudit({

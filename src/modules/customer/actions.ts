@@ -518,3 +518,35 @@ export async function requestOrderCancellation(orderId: string, reason: string) 
   revalidatePath(`/orders/${orderId}`);
   return { success: true as const };
 }
+
+export async function uploadPrescription(orderId: string, imageDataUrl: string) {
+  const session = await auth();
+  if (!session?.user || session.user.type !== "CUSTOMER") {
+    return { error: "Sizda ruxsat yo'q" };
+  }
+  if (!imageDataUrl.startsWith("data:image/")) {
+    return { error: "Faqat rasm fayli yuklang" };
+  }
+  if (imageDataUrl.length > 4_000_000) {
+    return { error: "Rasm hajmi juda katta — kichikroq rasm tanlang" };
+  }
+
+  const order = await prisma.order.findUnique({ where: { id: orderId } });
+  if (!order || order.customerId !== session.user.id) {
+    return { error: "Buyurtma topilmadi" };
+  }
+  if (!order.requiresPrescription) {
+    return { error: "Bu buyurtma retsept talab qilmaydi" };
+  }
+
+  await prisma.order.update({ where: { id: orderId }, data: { prescriptionImageUrl: imageDataUrl } });
+
+  await notifyRoles(["PHARMACIST", "MANAGER", "SUPER_ADMIN"], {
+    type: "NEW_ORDER",
+    title: "Retsept yuklandi",
+    body: `#${orderId.slice(-8).toUpperCase()} uchun retsept tekshirishni kutmoqda`,
+  });
+
+  revalidatePath(`/orders/${orderId}`);
+  return { success: true as const };
+}

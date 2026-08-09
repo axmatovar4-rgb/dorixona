@@ -16,6 +16,7 @@ import {
 import { cn } from "@/lib/utils";
 import { ReorderButton } from "@/modules/customer/components/reorder-button";
 import { CancelOrderButton } from "@/modules/customer/components/cancel-order-button";
+import { PrescriptionUpload } from "@/modules/customer/components/prescription-upload";
 
 export const metadata: Metadata = { title: "Buyurtma tafsilotlari" };
 
@@ -157,10 +158,27 @@ export default async function OrderDetailPage({
 
       {order.requiresPrescription && (
         <div className="rounded-2xl border bg-card p-5 portal-shadow-sm">
-          <h2 className="mb-2 text-sm font-semibold text-muted-foreground">Retsept</h2>
-          <Badge variant={order.prescriptionImageUrl ? "secondary" : "destructive"}>
-            {order.prescriptionImageUrl ? "Yuklangan · Tekshirilmoqda" : "Yuklanmagan"}
-          </Badge>
+          <div className="mb-3 flex items-center justify-between">
+            <h2 className="text-sm font-semibold text-muted-foreground">Retsept</h2>
+            <Badge variant={order.prescriptionImageUrl ? "secondary" : "destructive"}>
+              {order.prescriptionImageUrl ? "Yuklangan · Tekshirilmoqda" : "Yuklanmagan"}
+            </Badge>
+          </div>
+          {order.prescriptionImageUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element -- base64 data URI, next/image can't optimize it
+            <img
+              src={order.prescriptionImageUrl}
+              alt="Retsept"
+              className="max-h-64 w-fit rounded-xl border object-contain"
+            />
+          ) : (
+            <div className="flex flex-col gap-2">
+              <p className="text-sm text-muted-foreground">
+                Bu buyurtmadagi dorilar retsept talab qiladi. Buyurtma tayyorlanishi uchun retsept rasmini yuklang.
+              </p>
+              <PrescriptionUpload orderId={order.id} />
+            </div>
+          )}
         </div>
       )}
 
